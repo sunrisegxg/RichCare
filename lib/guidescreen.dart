@@ -95,7 +95,7 @@ class _GuideScreenState extends State<GuideScreen> {
                         padding: const EdgeInsets.only(bottom: 7),
                         child: TextField(
                           decoration: InputDecoration(
-                            hintText: "Search Articles...",
+                            hintText: "Search...",
                             hintStyle: TextStyle(
                               color: Colors.grey,
                               fontSize: 16,

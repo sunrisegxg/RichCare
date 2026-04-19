@@ -10,14 +10,34 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
+class PlannerNote {
+  final String title;
+  final String? description;
+  final TimeOfDay? reminder;
+
+  PlannerNote({required this.title, this.description, this.reminder});
+}
+
 class _HomeScreenState extends State<HomeScreen> {
-  DateTime today = DateTime.now();
+  DateTime focusedDay = DateTime.now();
   DateTime selectedDay = DateTime.now();
 
-  Map<DateTime, List<String>> notes = {
-    DateTime.utc(2026, 4, 12): ["Water the rice field", "Check leaf disease"],
-    DateTime.utc(2026, 4, 15): ["Apply fertilizer"],
+  final CalendarFormat _calendarFormat = CalendarFormat.month;
+
+  Map<DateTime, List<PlannerNote>> notes = {
+    DateTime.utc(2026, 4, 12): [
+      PlannerNote(title: "Water the rice field"),
+      PlannerNote(
+        title: "Check leaf disease",
+        reminder: const TimeOfDay(hour: 8, minute: 30),
+      ),
+    ],
+    DateTime.utc(2026, 4, 15): [PlannerNote(title: "Apply fertilizer")],
   };
+
+  DateTime normalize(DateTime day) {
+    return DateTime.utc(day.year, day.month, day.day);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,29 +103,28 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 18),
 
               // 🔹 Scan Card
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE7F6EA),
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.document_scanner, color: AppColors.btnbgrColor),
-                    const SizedBox(width: 12),
-                    Text(
-                      "Scan and identify rice diseases",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                        color: AppColors.btnbgrColor,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
+              // Container(
+              //   padding: const EdgeInsets.all(16),
+              //   decoration: BoxDecoration(
+              //     color: const Color(0xFFE7F6EA),
+              //     borderRadius: BorderRadius.circular(18),
+              //   ),
+              //   child: Row(
+              //     mainAxisAlignment: MainAxisAlignment.center,
+              //     children: [
+              //       Icon(Icons.document_scanner, color: AppColors.btnbgrColor),
+              //       const SizedBox(width: 12),
+              //       Text(
+              //         "Scan and identify rice diseases",
+              //         style: TextStyle(
+              //           fontWeight: FontWeight.w600,
+              //           fontSize: 14,
+              //           color: AppColors.btnbgrColor,
+              //         ),
+              //       ),
+              //     ],
+              //   ),
+              // ),
               const SizedBox(height: 22),
 
               // 🔹 Weather
@@ -165,20 +184,34 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         children: [
           TableCalendar(
+            calendarFormat: _calendarFormat,
+            pageAnimationEnabled: true,
             firstDay: DateTime.utc(2020, 1, 1),
             lastDay: DateTime.utc(2030, 12, 31),
-            focusedDay: today,
+            focusedDay: focusedDay,
             selectedDayPredicate: (day) => isSameDay(selectedDay, day),
 
             eventLoader: (day) {
-              return notes[DateTime.utc(day.year, day.month, day.day)] ?? [];
+              return notes[normalize(day)] ?? [];
             },
 
             onDaySelected: (selected, focused) {
               setState(() {
                 selectedDay = selected;
-                today = focused;
+                focusedDay = selected; // quan trọng: dùng selected
               });
+            },
+            onDayLongPressed: (selected, focused) async {
+              setState(() {
+                selectedDay = selected;
+                focusedDay = selected; // nhảy đúng tháng của ngày bấm
+              });
+
+              await showAddNoteSheet(selected);
+            },
+
+            onPageChanged: (newFocusedDay) {
+              focusedDay = newFocusedDay;
             },
 
             headerStyle: const HeaderStyle(
@@ -200,6 +233,40 @@ class _HomeScreenState extends State<HomeScreen> {
                 shape: BoxShape.circle,
               ),
             ),
+
+            calendarBuilders: CalendarBuilders(
+              markerBuilder: (context, day, events) {
+                final dayNotes = notes[normalize(day)] ?? [];
+
+                final hasReminder = dayNotes.any(
+                  (item) => item.reminder != null,
+                );
+
+                if (hasReminder) {
+                  return const Positioned(
+                    top: 4,
+                    right: 4,
+                    child: Icon(Icons.star, size: 12, color: Colors.amber),
+                  );
+                }
+
+                if (events.isNotEmpty) {
+                  return Positioned(
+                    bottom: 4,
+                    child: Container(
+                      width: 6,
+                      height: 6,
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  );
+                }
+
+                return null;
+              },
+            ),
           ),
 
           const SizedBox(height: 14),
@@ -210,11 +277,11 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  List<String> getNotesForDay(DateTime day) {
-    return notes[DateTime.utc(day.year, day.month, day.day)] ?? [];
+  List<PlannerNote> getNotesForDay(DateTime day) {
+    return notes[normalize(day)] ?? [];
   }
 
-  Widget noteItem(String text) {
+  Widget noteItem(PlannerNote note) {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
@@ -223,17 +290,301 @@ class _HomeScreenState extends State<HomeScreen> {
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.event_note, color: Colors.green),
+          Icon(
+            note.reminder != null ? Icons.star : Icons.event_note,
+            color: note.reminder != null ? Colors.amber : Colors.green,
+          ),
           const SizedBox(width: 10),
+
           Expanded(
-            child: Text(
-              text,
-              style: const TextStyle(fontWeight: FontWeight.w500),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  note.title,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+
+                if (note.description != null &&
+                    note.description!.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    note.description!,
+                    style: const TextStyle(fontSize: 13, color: Colors.black54),
+                  ),
+                ],
+
+                if (note.reminder != null) ...[
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      const Icon(Icons.alarm, size: 14, color: Colors.orange),
+                      const SizedBox(width: 4),
+                      Text(
+                        note.reminder!.format(context),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.orange,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ],
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Future<void> showAddNoteSheet(DateTime day) async {
+    final titleController = TextEditingController();
+    final descController = TextEditingController();
+    TimeOfDay? reminder;
+
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setSheetState) {
+            return Container(
+              padding: EdgeInsets.fromLTRB(
+                18,
+                14,
+                18,
+                MediaQuery.of(context).viewInsets.bottom + 20,
+              ),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  /// Handle
+                  Container(
+                    width: 48,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+
+                  const SizedBox(height: 18),
+
+                  /// Header
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.green.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: const Icon(
+                          Icons.edit_note_rounded,
+                          color: Colors.green,
+                        ),
+                      ),
+
+                      const SizedBox(width: 12),
+
+                      const Expanded(
+                        child: Text(
+                          "Add Planner Note",
+                          style: TextStyle(
+                            fontSize: 19,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 18),
+
+                  /// Date Box
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xffF5F7F6),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.calendar_month,
+                          color: Colors.green,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 10),
+                        Text(
+                          "${day.day}/${day.month}/${day.year}",
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 14),
+
+                  /// Title
+                  TextField(
+                    controller: titleController,
+                    decoration: InputDecoration(
+                      hintText: "Title *",
+                      prefixIcon: const Icon(Icons.title),
+                      filled: true,
+                      fillColor: const Color(0xffF8FAF8),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  /// Description
+                  TextField(
+                    controller: descController,
+                    maxLines: 3,
+                    decoration: InputDecoration(
+                      hintText: "Description (optional)",
+                      alignLabelWithHint: true,
+                      prefixIcon: const Padding(
+                        padding: EdgeInsets.only(bottom: 52),
+                        child: Icon(Icons.notes),
+                      ),
+                      filled: true,
+                      fillColor: const Color(0xffF8FAF8),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  /// Reminder
+                  InkWell(
+                    borderRadius: BorderRadius.circular(16),
+                    onTap: () async {
+                      final picked = await showTimePicker(
+                        context: context,
+                        initialTime: TimeOfDay.now(),
+                      );
+
+                      if (picked != null) {
+                        setSheetState(() {
+                          reminder = picked;
+                        });
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 14,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xffF8FAF8),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.alarm, color: Colors.orange),
+                          const SizedBox(width: 10),
+
+                          Expanded(
+                            child: Text(
+                              reminder == null
+                                  ? "Set reminder"
+                                  : reminder!.format(context),
+                              style: TextStyle(
+                                color: reminder == null
+                                    ? Colors.black54
+                                    : Colors.black,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+
+                          if (reminder != null)
+                            InkWell(
+                              onTap: () {
+                                setSheetState(() {
+                                  reminder = null;
+                                });
+                              },
+                              child: const Icon(Icons.close, size: 18),
+                            )
+                          else
+                            const Icon(Icons.chevron_right, color: Colors.grey),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  /// Save Button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        elevation: 0,
+                        backgroundColor: AppColors.btnbgrColor,
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      onPressed: () {
+                        if (titleController.text.trim().isEmpty) return;
+
+                        final key = normalize(day);
+
+                        final newNote = PlannerNote(
+                          title: titleController.text.trim(),
+                          description: descController.text.trim(),
+                          reminder: reminder,
+                        );
+
+                        setState(() {
+                          notes.putIfAbsent(key, () => []);
+                          notes[key]!.add(newNote);
+                        });
+
+                        Navigator.pop(context);
+                      },
+                      child: const Text(
+                        "Save Note",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
@@ -263,71 +614,111 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // 🔹 Weather Card
   Widget weatherCard() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xff4FC3F7), Color(0xff1976D2)],
+          colors: [Color(0xFF4FC3F7), Color(0xFF1976D2)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(22),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.blue.withOpacity(0.18),
+            blurRadius: 14,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
       child: Column(
         children: [
+          /// 🔹 TOP 50 / 50
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Da Nang",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 2),
-                  Text(
-                    "Sunny day",
-                    style: TextStyle(color: Colors.white70, fontSize: 11),
-                  ),
-                ],
-              ),
-              Icon(Icons.wb_sunny_rounded, color: Colors.yellow, size: 34),
-            ],
-          ),
-
-          const SizedBox(height: 10),
-
-          const Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                "31",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 34,
-                  fontWeight: FontWeight.bold,
+              /// LEFT ICON
+              Expanded(
+                child: SizedBox(
+                  height: 120,
+                  child: Center(
+                    child: Image.asset("assets/images/cloudy.png", height: 90),
+                  ),
                 ),
               ),
-              Text("°C", style: TextStyle(color: Colors.white, fontSize: 18)),
+
+              /// Divider giữa
+              Container(
+                width: 1,
+                height: 95,
+                color: Colors.white.withOpacity(0.25),
+              ),
+
+              /// RIGHT INFO
+              Expanded(
+                child: SizedBox(
+                  height: 120,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Text(
+                          "Da Nang",
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+
+                        SizedBox(height: 6),
+
+                        Text(
+                          "27°",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 42,
+                            fontWeight: FontWeight.bold,
+                            height: 1,
+                          ),
+                        ),
+
+                        SizedBox(height: 6),
+
+                        Text(
+                          "Sunny cloudy",
+                          style: TextStyle(color: Colors.white70, fontSize: 12),
+                        ),
+
+                        SizedBox(height: 4),
+
+                        Text(
+                          "Monday, 18 Apr",
+                          style: TextStyle(color: Colors.white60, fontSize: 11),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
 
+          /// Divider ngang
+          Container(height: 1, color: Colors.white.withOpacity(0.25)),
+
+          const SizedBox(height: 14),
+
+          /// 🔹 Bottom Info
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              weatherInfo(Icons.water_drop, "Humidity", "78%"),
-              weatherInfo(Icons.air, "Wind", "12 km/h"),
-              weatherInfo(Icons.thermostat, "Feels", "34°C"),
+              weatherInfoBlue("assets/images/wind.png", "Wind", "7 km/h"),
+              weatherInfoBlue("assets/images/humidity.png", "Humidity", "82%"),
+              weatherInfoBlue("assets/images/protection.png", "Rain", "20%"),
             ],
           ),
         ],
@@ -335,23 +726,23 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget weatherInfo(IconData icon, String title, String value) {
+  Widget weatherInfoBlue(String image, String title, String value) {
     return Column(
       children: [
-        Icon(icon, color: Colors.white, size: 16),
+        Image.asset(image, height: 24),
         const SizedBox(height: 4),
-        Text(
-          title,
-          style: const TextStyle(color: Colors.white70, fontSize: 10),
-        ),
-        const SizedBox(height: 2),
         Text(
           value,
           style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
-            fontSize: 11,
+            fontSize: 12,
           ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          title,
+          style: const TextStyle(color: Colors.white70, fontSize: 10),
         ),
       ],
     );

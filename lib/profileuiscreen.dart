@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'editprofilescreen.dart';
+
 class ProfileScreenUI extends StatefulWidget {
   const ProfileScreenUI({super.key});
 
@@ -15,6 +17,7 @@ class _ProfileScreenUIState extends State<ProfileScreenUI> {
       body: SafeArea(
         child: Column(
           children: [
+            SizedBox(height: 20),
             // 🔹 Header
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -53,7 +56,17 @@ class _ProfileScreenUIState extends State<ProfileScreenUI> {
                 children: [
                   // 🔹 Account Setting
                   sectionTitle("Account Setting"),
-                  settingItem(Icons.person, "Edit profile"),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const EditProfileScreen(),
+                        ),
+                      );
+                    },
+                    child: settingItem(Icons.person, "Edit profile"),
+                  ),
                   settingItem(Icons.language, "Change language"),
                   settingItem(Icons.lock, "Privacy"),
 

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:ricecare/components/btn_text.dart';
@@ -5,6 +7,7 @@ import 'package:ricecare/constants/colors.dart';
 
 import 'components/btn_social.dart';
 import 'components/textfield_type.dart';
+import 'features/auth_repository.dart';
 
 class RegisterScreen extends StatefulWidget {
   final VoidCallback showLoginPage;
@@ -17,17 +20,40 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen> {
   final _focusNode1 = FocusNode();
   final _focusNode2 = FocusNode();
+  final _focusNode3 = FocusNode();
+  final _focusNode4 = FocusNode();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _usernameController = TextEditingController();
+  final _passwordCfController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _obscureText = true;
   @override
   void dispose() {
     _focusNode1.dispose();
     _focusNode2.dispose();
+    _focusNode3.dispose();
+    _focusNode4.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _usernameController.dispose();
+    _passwordCfController.dispose();
     super.dispose();
+  }
+
+  void onRegister() async {
+    bool success = await AuthRepository().register(
+      username: _emailController.text,
+      password: _passwordController.text,
+      dob: "2004-04-20",
+    );
+
+    if (success) {
+      log("Đăng ký thành công");
+      widget.showLoginPage();
+    } else {
+      log("Đăng ký thất bại");
+    }
   }
 
   @override
@@ -111,7 +137,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   obscureText: false,
                   numBorder: 8,
                   focusNode: _focusNode1,
-                  controller: _emailController,
+                  controller: _usernameController,
                   hintText: "@example",
                   keyboardType: TextInputType.text,
                   textInputAction: TextInputAction.done,
@@ -119,7 +145,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       FocusScope.of(context).requestFocus(_focusNode2),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return "Please enter your email";
+                      return "Please enter your username";
                     }
                     //  else if (!InputValidation().isEmailValid(value)) {
                     //   return 'Invalid email';
@@ -143,13 +169,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 MyTextField(
                   obscureText: false,
                   numBorder: 8,
-                  focusNode: _focusNode1,
+                  focusNode: _focusNode2,
                   controller: _emailController,
                   hintText: "example@gmail.com",
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.done,
                   onSubmitted: (value) =>
-                      FocusScope.of(context).requestFocus(_focusNode2),
+                      FocusScope.of(context).requestFocus(_focusNode3),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return "Please enter your email";
@@ -177,7 +203,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   numBorder: 8,
                   obscureText: _obscureText,
                   hintText: "Bfnsj12@dj#",
-                  focusNode: _focusNode2,
+                  focusNode: _focusNode3,
                   controller: _passwordController,
                   keyboardType: TextInputType.visiblePassword,
                   textInputAction: TextInputAction.done,
@@ -192,7 +218,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       _obscureText ? Icons.visibility_off : Icons.visibility,
                     ),
                   ),
-                  onSubmitted: (value) => FocusScope.of(context).unfocus(),
+                  onSubmitted: (value) =>
+                      FocusScope.of(context).requestFocus(_focusNode3),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return "Please enter your password";
@@ -217,8 +244,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   numBorder: 8,
                   obscureText: _obscureText,
                   hintText: "Bfnsj12@dj#",
-                  focusNode: _focusNode2,
-                  controller: _passwordController,
+                  focusNode: _focusNode4,
+                  controller: _passwordCfController,
                   keyboardType: TextInputType.visiblePassword,
                   textInputAction: TextInputAction.done,
                   suffixIcon: IconButton(
@@ -244,7 +271,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 BtnText(
                   width: double.infinity,
                   text: "Sign up",
-                  onPressed: () {},
+                  onPressed: () => onRegister(),
                 ),
                 SizedBox(height: MediaQuery.of(context).size.height * 0.04),
                 RichText(

@@ -1,13 +1,14 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:ricecare/test.dart';
-import 'loginscreen.dart';
+import 'package:ricecare/splashscreen.dart';
 
-import 'onboardingscreen.dart';
-
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // await Firebase.initializeApp();
+
   SystemChrome.setSystemUIOverlayStyle(
     // thanh trang thai
     SystemUiOverlayStyle(
@@ -29,7 +30,7 @@ class MyApp extends StatelessWidget {
         textTheme: GoogleFonts.poppinsTextTheme(),
         scaffoldBackgroundColor: Colors.white,
       ),
-      home: OnBoardingScreen(),
+      home: SplashScreen(),
       debugShowCheckedModeBanner: false,
     );
   }

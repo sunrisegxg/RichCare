@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:ricecare/authswitcherscreen.dart';
 
 import 'editprofilescreen.dart';
+import 'features/auth_repository.dart';
+import 'services/token_service.dart';
 
 class ProfileScreenUI extends StatefulWidget {
   const ProfileScreenUI({super.key});
@@ -10,6 +13,20 @@ class ProfileScreenUI extends StatefulWidget {
 }
 
 class _ProfileScreenUIState extends State<ProfileScreenUI> {
+  void logout(BuildContext context) async {
+    final token = await TokenService.get();
+
+    if (token != null) {
+      await AuthRepository().logoutFlow(token);
+    }
+
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (_) => AuthSwitcherScreen()),
+      (route) => false,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -95,20 +112,23 @@ class _ProfileScreenUIState extends State<ProfileScreenUI> {
                   const SizedBox(height: 30),
 
                   // 🔹 Logout
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Center(
-                      child: Text(
-                        "Logout",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.w500,
-                          decoration: TextDecoration.underline,
+                  GestureDetector(
+                    onTap: () => logout(context),
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Center(
+                        child: Text(
+                          "Logout",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w500,
+                            decoration: TextDecoration.underline,
+                          ),
                         ),
                       ),
                     ),

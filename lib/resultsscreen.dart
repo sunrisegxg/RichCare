@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:readmore/readmore.dart';
 import 'package:ricecare/constants/colors.dart';
+
+import 'main.dart';
 
 enum ResultType { scan, history, guide }
 
@@ -18,6 +21,27 @@ class _ResultsScreenState extends State<ResultsScreen> {
     bool isScan = widget.type == ResultType.scan;
     bool isHistory = widget.type == ResultType.history;
     bool isGuide = widget.type == ResultType.guide;
+    Future<void> showNotification() async {
+      const AndroidNotificationDetails androidDetails =
+          AndroidNotificationDetails(
+            'channel_id',
+            'Reminder',
+            importance: Importance.max,
+            priority: Priority.high,
+          );
+
+      const NotificationDetails details = NotificationDetails(
+        android: androidDetails,
+      );
+
+      await flutterLocalNotificationsPlugin.show(
+        id: 0,
+        title: 'Xin chào 👋',
+        body: 'Đây là Local Notification đầu tiên của bạn!',
+        notificationDetails: details,
+      );
+    }
+
     return Scaffold(
       backgroundColor: Colors.grey[100],
       body: Stack(
@@ -241,7 +265,9 @@ class _ResultsScreenState extends State<ResultsScreen> {
                           children: [
                             Expanded(
                               child: OutlinedButton(
-                                onPressed: () => Navigator.pop(context),
+                                onPressed: () {
+                                  showNotification();
+                                },
                                 style: OutlinedButton.styleFrom(
                                   foregroundColor: isHistory
                                       ? Colors.red

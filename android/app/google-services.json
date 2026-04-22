@@ -12,7 +12,20 @@
           "package_name": "com.example.ricecare"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "966627803704-trkrrmk2t8d1etv693rhdqbshfk11t68.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.ricecare",
+            "certificate_hash": "51a58e8b600d85e50502cab09f3039d5d986596b"
+          }
+        },
+        {
+          "client_id": "966627803704-8i8lg6e2bqanj4nja67g052rsm5orjtv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDLkXSc_z8COffp46tZMNw-axvyU7pFs8Y"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "966627803704-5efl3j3b1ap48gl1qmifi6rbhfq099ra.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

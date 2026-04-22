@@ -1,7 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:ricecare/constants/colors.dart';
 import 'package:ricecare/profileuiscreen.dart';
 import 'package:table_calendar/table_calendar.dart';
+
+import 'models/plannernote.dart';
+import 'services/planner_service.dart';
+import 'services/token_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -10,33 +16,54 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class PlannerNote {
-  final String title;
-  final String? description;
-  final TimeOfDay? reminder;
-
-  PlannerNote({required this.title, this.description, this.reminder});
-}
-
 class _HomeScreenState extends State<HomeScreen> {
+  String? userId;
+  final noteService = PlannerService();
   DateTime focusedDay = DateTime.now();
   DateTime selectedDay = DateTime.now();
+  StreamSubscription? _noteSub;
 
   final CalendarFormat _calendarFormat = CalendarFormat.month;
-
-  Map<DateTime, List<PlannerNote>> notes = {
-    DateTime.utc(2026, 4, 12): [
-      PlannerNote(title: "Water the rice field"),
-      PlannerNote(
-        title: "Check leaf disease",
-        reminder: const TimeOfDay(hour: 8, minute: 30),
-      ),
-    ],
-    DateTime.utc(2026, 4, 15): [PlannerNote(title: "Apply fertilizer")],
-  };
+  Map<DateTime, List<PlannerNote>> notes = {};
+  @override
+  void initState() {
+    super.initState();
+    loadUser();
+  }
 
   DateTime normalize(DateTime day) {
     return DateTime.utc(day.year, day.month, day.day);
+  }
+
+  void loadUser() async {
+    final id = await TokenService.getUserId();
+
+    userId = id;
+    if (!mounted || userId == null) return;
+
+    await _noteSub?.cancel();
+
+    _noteSub = noteService.getNotes(userId!).listen((list) {
+      if (!mounted) return;
+
+      final Map<DateTime, List<PlannerNote>> loaded = {};
+
+      for (final note in list) {
+        final key = normalize(note.date);
+        loaded.putIfAbsent(key, () => []);
+        loaded[key]!.add(note);
+      }
+
+      setState(() {
+        notes = loaded;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _noteSub?.cancel();
+    super.dispose();
   }
 
   @override
@@ -551,22 +578,22 @@ class _HomeScreenState extends State<HomeScreen> {
                           borderRadius: BorderRadius.circular(16),
                         ),
                       ),
-                      onPressed: () {
+                      onPressed: () async {
                         if (titleController.text.trim().isEmpty) return;
 
                         final key = normalize(day);
 
                         final newNote = PlannerNote(
+                          id: "",
                           title: titleController.text.trim(),
                           description: descController.text.trim(),
+                          date: day,
                           reminder: reminder,
                         );
 
-                        setState(() {
-                          notes.putIfAbsent(key, () => []);
-                          notes[key]!.add(newNote);
-                        });
+                        if (userId == null) return;
 
+                        await noteService.addNote(userId!, newNote);
                         Navigator.pop(context);
                       },
                       child: const Text(

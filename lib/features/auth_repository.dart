@@ -21,8 +21,10 @@ class AuthRepository {
         data["result"] != null &&
         data["result"]["authenticated"] == true) {
       final token = data["result"]["token"];
-      await TokenService.save(token);
+      final userId = data["result"]["idFE"];
 
+      await TokenService.save(token);
+      await TokenService.saveUserId(userId);
       return true;
     }
 
@@ -79,8 +81,10 @@ class AuthRepository {
 
     if (response.statusCode == 200 && data["result"]["authenticated"] == true) {
       final token = data["result"]["token"];
+      final userId = data["result"]["idFE"];
 
-      await TokenService.save(token); // lưu JWT backend
+      await TokenService.save(token);
+      await TokenService.saveUserId(userId);
       return true;
     }
 

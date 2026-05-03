@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:readmore/readmore.dart';
 import 'package:ricecare/constants/colors.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'main.dart';
 
@@ -22,6 +23,14 @@ class _ResultsScreenState extends State<ResultsScreen> {
     bool isHistory = widget.type == ResultType.history;
     bool isGuide = widget.type == ResultType.guide;
     Future<void> showNotification() async {
+      final prefs = await SharedPreferences.getInstance();
+      final enabled = prefs.getBool('notification_enabled') ?? false;
+
+      if (!enabled) {
+        print("Notification đang bị tắt");
+        return; // ❌ không gửi
+      }
+
       const AndroidNotificationDetails androidDetails =
           AndroidNotificationDetails(
             'channel_id',

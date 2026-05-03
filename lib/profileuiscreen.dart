@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:ricecare/authswitcherscreen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'editprofilescreen.dart';
 import 'features/auth_repository.dart';
+import 'services/notification_service.dart';
 import 'services/token_service.dart';
 
 class ProfileScreenUI extends StatefulWidget {
@@ -13,6 +15,7 @@ class ProfileScreenUI extends StatefulWidget {
 }
 
 class _ProfileScreenUIState extends State<ProfileScreenUI> {
+  bool isNotificationEnabled = false;
   void logout(BuildContext context) async {
     final token = await TokenService.get();
 
@@ -25,6 +28,47 @@ class _ProfileScreenUIState extends State<ProfileScreenUI> {
       MaterialPageRoute(builder: (_) => AuthSwitcherScreen()),
       (route) => false,
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    loadStatus();
+  }
+
+  Future<void> loadStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    final saved = prefs.getBool('notification_enabled') ?? false;
+
+    final systemEnabled = await NotificationService.isEnabled();
+
+    setState(() {
+      isNotificationEnabled = saved && systemEnabled;
+    });
+  }
+
+  Future<void> toggleNotification(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    if (value) {
+      final granted = await NotificationService.requestPermission();
+
+      if (granted) {
+        setState(() => isNotificationEnabled = true);
+        await prefs.setBool('notification_enabled', true);
+      } else {
+        NotificationService.openSettings();
+      }
+    } else {
+      setState(() => isNotificationEnabled = false);
+      await prefs.setBool('notification_enabled', false);
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    loadStatus();
   }
 
   @override
@@ -107,6 +151,39 @@ class _ProfileScreenUIState extends State<ProfileScreenUI> {
                     Icons.privacy_tip,
                     "Privacy Policy",
                     isExternal: true,
+                  ),
+                  const SizedBox(height: 20),
+                  sectionTitle("Preferences"),
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 16,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE8F1EA),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.notifications,
+                          size: 18,
+                          color: Colors.green[900],
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            "Notifications",
+                            style: TextStyle(color: Colors.green[900]),
+                          ),
+                        ),
+                        Switch(
+                          value: isNotificationEnabled,
+                          onChanged: toggleNotification,
+                        ),
+                      ],
+                    ),
                   ),
 
                   const SizedBox(height: 30),

@@ -30,12 +30,6 @@ void main() async {
 
   await flutterLocalNotificationsPlugin.initialize(settings: settings);
 
-  await flutterLocalNotificationsPlugin
-      .resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin
-      >()
-      ?.requestNotificationsPermission();
-
   runApp(const MyApp());
 }
 

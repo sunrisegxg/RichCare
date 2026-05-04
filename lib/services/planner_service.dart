@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../models/plannernote.dart';
+import '../models/notemodel.dart';
 
 class PlannerService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;

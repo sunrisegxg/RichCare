@@ -5,7 +5,7 @@ import 'package:ricecare/constants/colors.dart';
 import 'package:ricecare/profileuiscreen.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-import 'models/plannernote.dart';
+import 'models/notemodel.dart';
 import 'services/planner_service.dart';
 import 'services/token_service.dart';
 
@@ -580,8 +580,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       onPressed: () async {
                         if (titleController.text.trim().isEmpty) return;
-
-                        final key = normalize(day);
 
                         final newNote = PlannerNote(
                           id: "",

@@ -5,7 +5,6 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'components/btn_next.dart';
 import 'components/btn_text.dart';
 import 'constants/colors.dart';
-import 'loginscreen.dart';
 
 class OnBoardingScreen extends StatefulWidget {
   const OnBoardingScreen({super.key});

@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:ricecare/components/btn_text.dart';
 import 'package:ricecare/constants/colors.dart';
 
-import 'components/btn_social.dart';
 import 'components/textfield_type.dart';
 import 'features/auth_repository.dart';
 

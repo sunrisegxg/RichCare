@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'constants/colors.dart';
+import 'models/historymodel.dart';
 import 'resultsscreen.dart';
+import 'services/history_service.dart';
+import 'services/token_service.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -10,12 +13,32 @@ class HistoryScreen extends StatefulWidget {
 }
 
 class _HistoryScreenState extends State<HistoryScreen> {
-  late PageController _pageController;
+  String? userId;
+
+  List<HistoryModel> historyList = [];
+  bool isLoading = true;
+
+  final PageController _pageController = PageController();
+  int selectedTab = 0;
 
   @override
   void initState() {
     super.initState();
-    _pageController = PageController();
+    loadUser();
+  }
+
+  // ================= LOAD DATA =================
+  void loadUser() async {
+    final id = await TokenService.getUserId();
+    if (!mounted || id == null) return;
+
+    final data = await HistoryService().getHistoryOnce(id);
+
+    setState(() {
+      userId = id;
+      historyList = data;
+      isLoading = false;
+    });
   }
 
   @override
@@ -24,53 +47,29 @@ class _HistoryScreenState extends State<HistoryScreen> {
     super.dispose();
   }
 
-  int selectedTab = 0;
-
+  // ================= UI =================
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
           children: [
             const SizedBox(height: 10),
-
-            // 🔹 Header (thay AppBar)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    "History",
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Icon(Icons.menu, size: 20),
-                  ),
-                ],
-              ),
-            ),
-
+            _buildHeader(),
             const SizedBox(height: 16),
-
             buildSegmentedControl(),
-
             const SizedBox(height: 12),
 
-            // 🔹 List
             Expanded(
               child: PageView(
                 controller: _pageController,
                 onPageChanged: (index) {
-                  setState(() {
-                    selectedTab = index;
-                  });
+                  setState(() => selectedTab = index);
                 },
                 children: [buildTodayList(), buildAllList()],
               ),
@@ -81,6 +80,33 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
+  // ================= HEADER (CÓ KHUNG MENU) =================
+  Widget _buildHeader() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text(
+            "History",
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          ),
+
+          // 🔥 KHUNG NÚT MENU
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: const Icon(Icons.menu, size: 20),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ================= SEGMENTED (KHUNG ĐẸP + SLIDE) =================
   Widget buildSegmentedControl() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -92,42 +118,28 @@ class _HistoryScreenState extends State<HistoryScreen> {
         ),
         child: Stack(
           children: [
-            // 🔥 nền trắng trượt
-            AnimatedBuilder(
-              animation: _pageController,
-              builder: (context, child) {
-                double page = 0;
-
-                if (_pageController.hasClients &&
-                    _pageController.page != null) {
-                  page = _pageController.page!;
-                } else {
-                  page = selectedTab.toDouble();
-                }
-
-                return Align(
-                  alignment: Alignment(-1 + page * 2, 0), // 🔥 trượt realtime
-                  child: child,
-                );
-              },
+            // 🔥 SLIDE BACKGROUND
+            AnimatedPositioned(
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeInOut,
+              left: selectedTab == 0
+                  ? 4
+                  : (MediaQuery.of(context).size.width - 32) / 2 + 4,
+              right: selectedTab == 1
+                  ? 4
+                  : (MediaQuery.of(context).size.width - 32) / 2 + 4,
+              top: 4,
+              bottom: 4,
               child: Container(
-                width: (MediaQuery.of(context).size.width - 32) / 2,
-                margin: const EdgeInsets.all(4),
+                width: (MediaQuery.of(context).size.width - 40) / 2,
+                margin: const EdgeInsets.only(left: 0),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      blurRadius: 6,
-                      color: Colors.black.withOpacity(0.05),
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
                 ),
               ),
             ),
 
-            // 🔹 text + click
             Row(
               children: [
                 Expanded(child: buildTab("Today", 0)),
@@ -144,11 +156,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
     final isSelected = selectedTab == index;
 
     return GestureDetector(
-      behavior: HitTestBehavior.opaque, // 🔥 click full vùng
       onTap: () {
-        setState(() {
-          selectedTab = index;
-        });
+        setState(() => selectedTab = index);
 
         _pageController.animateToPage(
           index,
@@ -160,7 +169,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         child: Text(
           text,
           style: TextStyle(
-            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
             color: isSelected ? Colors.black : Colors.grey,
           ),
         ),
@@ -168,23 +177,46 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
+  // ================= TODAY =================
   Widget buildTodayList() {
+    final now = DateTime.now();
+
+    final todayList = historyList.where((item) {
+      return item.time.year == now.year &&
+          item.time.month == now.month &&
+          item.time.day == now.day;
+    }).toList();
+
+    if (todayList.isEmpty) {
+      return const Center(child: Text("No history today"));
+    }
+
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      itemCount: 5,
-      itemBuilder: (context, index) => historyItem(),
+      itemCount: todayList.length,
+      itemBuilder: (context, index) {
+        return historyItem(todayList[index]);
+      },
     );
   }
 
+  // ================= ALL =================
   Widget buildAllList() {
+    if (historyList.isEmpty) {
+      return const Center(child: Text("No history yet"));
+    }
+
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      itemCount: 10,
-      itemBuilder: (context, index) => historyItem(),
+      itemCount: historyList.length,
+      itemBuilder: (context, index) {
+        return historyItem(historyList[index]);
+      },
     );
   }
 
-  Widget historyItem() {
+  // ================= ITEM =================
+  Widget historyItem(HistoryModel item) {
     return GestureDetector(
       onTap: () => Navigator.push(
         context,
@@ -203,11 +235,17 @@ class _HistoryScreenState extends State<HistoryScreen> {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(10),
-              child: Image.asset(
-                "assets/images/paddy1.jpg",
+              child: Image.network(
+                item.imageUrl,
                 width: 55,
                 height: 55,
                 fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Container(
+                  width: 55,
+                  height: 55,
+                  color: Colors.grey[300],
+                  child: const Icon(Icons.broken_image),
+                ),
               ),
             ),
             const SizedBox(width: 12),
@@ -215,23 +253,26 @@ class _HistoryScreenState extends State<HistoryScreen> {
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
+                children: [
                   Text(
-                    "Rice Blast Disease",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                    item.title,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
-                    "How to detect rice blast early",
-                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                    "Confidence: ${item.confidence}",
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
                   ),
                 ],
               ),
             ),
 
-            const Text(
-              "15 Jun 2026",
-              style: TextStyle(fontSize: 11, color: Colors.grey),
+            Text(
+              "${item.time.day}/${item.time.month}/${item.time.year}",
+              style: const TextStyle(fontSize: 11, color: Colors.grey),
             ),
           ],
         ),

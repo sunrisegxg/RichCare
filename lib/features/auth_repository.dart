@@ -8,7 +8,7 @@ import '../services/token_service.dart';
 class AuthRepository {
   Future<bool> login(String username, String password) async {
     final response = await http.post(
-      Uri.parse("http://192.168.3.127:8080/authen"), //nhớ đổi IP nếu cần
+      Uri.parse("http://192.168.1.79:8080/authen"), //nhớ đổi IP nếu cần
       headers: {"Content-Type": "application/json"},
       body: jsonEncode({"username": username, "password": password}),
     );
@@ -37,7 +37,7 @@ class AuthRepository {
     required String dob,
   }) async {
     final response = await http.post(
-      Uri.parse("http://192.168.3.127:8080/api/v1/users/signup"), //10.0.2.2
+      Uri.parse("http://192.168.1.79:8080/api/v1/users/signup"), //10.0.2.2
       headers: {"Content-Type": "application/json"},
       body: jsonEncode({
         "username": username,
@@ -60,7 +60,7 @@ class AuthRepository {
     await GoogleAuthService().signOutGoogle(); // nếu có login Google
 
     await http.post(
-      Uri.parse("http://192.168.3.127:8080/authen/logout"),
+      Uri.parse("http://192.168.1.79:8080/authen/logout"),
       headers: {"Content-Type": "application/json"},
       body: jsonEncode({"token": token}),
     );
@@ -70,7 +70,7 @@ class AuthRepository {
 
   Future<bool> loginWithGoogle(String idToken) async {
     final response = await http.post(
-      Uri.parse("http://192.168.3.127:8080/autheng/api/v1/auth/google"),
+      Uri.parse("http://192.168.1.79:8080/autheng/api/v1/auth/google"),
       headers: {"Content-Type": "application/json"},
       body: jsonEncode({"idToken": idToken}),
     );

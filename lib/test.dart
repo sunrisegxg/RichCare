@@ -16,7 +16,7 @@ class Test extends StatefulWidget {
 class _TestState extends State<Test> {
   int _selectedIndex = 0;
   List<Widget> get _pages => [
-    HomeScreen(),
+    HomeScreen(onTabSelected: _onItemTapped),
     ChatScreen(),
     GuideScreen(),
     HistoryScreen(),

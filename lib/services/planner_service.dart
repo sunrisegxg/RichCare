@@ -13,6 +13,24 @@ class PlannerService {
         .add(note.toMap());
   }
 
+  Future<void> updateNote(String userId, PlannerNote note) async {
+    await _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('notes')
+        .doc(note.id)
+        .update(note.toMap());
+  }
+
+  Future<void> deleteNote(String userId, String noteId) async {
+    await _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('notes')
+        .doc(noteId)
+        .delete();
+  }
+
   /// 🔹 Lấy note theo user
   Stream<List<PlannerNote>> getNotes(String userId) {
     return _firestore

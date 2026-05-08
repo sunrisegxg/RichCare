@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:ricecare/constants/colors.dart';
 import 'package:ricecare/profileuiscreen.dart';
+import 'package:ricecare/scanscreen.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import 'models/notemodel.dart';
@@ -10,7 +11,9 @@ import 'services/planner_service.dart';
 import 'services/token_service.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final ValueChanged<int>? onTabSelected;
+
+  const HomeScreen({super.key, this.onTabSelected});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -173,10 +176,41 @@ class _HomeScreenState extends State<HomeScreen> {
                 crossAxisSpacing: 12,
                 childAspectRatio: 2.2,
                 children: [
-                  actionCard("Ask AI", Icons.smart_toy, Colors.blue),
-                  actionCard("History", Icons.history, Colors.orange),
-                  actionCard("Guide", Icons.menu_book, Colors.purple),
-                  actionCard("Community", Icons.people, Colors.green),
+                  actionCard(
+                    "Ask AI",
+                    Icons.smart_toy,
+                    Colors.blue,
+                    onTap: () {
+                      widget.onTabSelected?.call(1);
+                    },
+                  ),
+                  actionCard(
+                    "History",
+                    Icons.history,
+                    Colors.orange,
+                    onTap: () {
+                      widget.onTabSelected?.call(3);
+                    },
+                  ),
+                  actionCard(
+                    "Guide",
+                    Icons.menu_book,
+                    Colors.purple,
+                    onTap: () {
+                      widget.onTabSelected?.call(2);
+                    },
+                  ),
+                  actionCard(
+                    "Scan AI",
+                    Icons.document_scanner,
+                    Colors.green,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const ScanScreen()),
+                      );
+                    },
+                  ),
                 ],
               ),
 
@@ -211,6 +245,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         children: [
           TableCalendar(
+            availableGestures: AvailableGestures.horizontalSwipe,
             calendarFormat: _calendarFormat,
             pageAnimationEnabled: true,
             firstDay: DateTime.utc(2020, 1, 1),
@@ -298,7 +333,192 @@ class _HomeScreenState extends State<HomeScreen> {
 
           const SizedBox(height: 14),
 
-          ...getNotesForDay(selectedDay).map((note) => noteItem(note)),
+          ...getNotesForDay(selectedDay).map(
+            (note) => Dismissible(
+              key: ValueKey(note.id),
+              direction: DismissDirection.horizontal,
+              background: Container(
+                margin: const EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.only(left: 20),
+                decoration: BoxDecoration(
+                  color: Colors.blue,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                alignment: Alignment.centerLeft,
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.edit, color: Colors.white),
+                    SizedBox(width: 8),
+                    Text(
+                      'Edit',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              secondaryBackground: Container(
+                margin: const EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.only(right: 20),
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                alignment: Alignment.centerRight,
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Delete',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    Icon(Icons.delete, color: Colors.white),
+                  ],
+                ),
+              ),
+              confirmDismiss: (direction) async {
+                if (direction == DismissDirection.startToEnd) {
+                  await showAddNoteSheet(selectedDay, note: note);
+                  return false;
+                }
+
+                if (direction == DismissDirection.endToStart) {
+                  final shouldDelete = await showDialog<bool>(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(24),
+                        ),
+                        backgroundColor: Colors.white,
+                        titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+                        contentPadding: const EdgeInsets.fromLTRB(
+                          24,
+                          12,
+                          24,
+                          0,
+                        ),
+                        actionsPadding: const EdgeInsets.fromLTRB(
+                          16,
+                          24,
+                          16,
+                          16,
+                        ),
+                        title: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            // Container(
+                            //   padding: const EdgeInsets.all(10),
+                            //   decoration: BoxDecoration(
+                            //     color: Colors.red.withOpacity(0.12),
+                            //     shape: BoxShape.circle,
+                            //   ),
+                            //   child: const Icon(
+                            //     Icons.delete_outline,
+                            //     color: Colors.red,
+                            //     size: 24,
+                            //   ),
+                            // ),
+                            // const SizedBox(width: 12),
+                            const Text(
+                              'Delete note',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        content: const Text(
+                          'Are you sure you want to delete this note? This action cannot be undone.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.black54, height: 1.4),
+                        ),
+                        actions: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: OutlinedButton(
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: Colors.grey[800],
+                                    backgroundColor: Colors.grey.shade100,
+                                    side: BorderSide(
+                                      color: Colors.grey.shade300,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 16,
+                                    ),
+                                  ),
+                                  onPressed: () =>
+                                      Navigator.of(context).pop(false),
+                                  child: const Text(
+                                    'Cancel',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.red,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 16,
+                                    ),
+                                  ),
+                                  onPressed: () =>
+                                      Navigator.of(context).pop(true),
+                                  child: const Text(
+                                    'Delete',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      );
+                    },
+                  );
+
+                  if (shouldDelete == true && userId != null) {
+                    await noteService.deleteNote(userId!, note.id);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Text('Note deleted'),
+                        behavior: SnackBarBehavior.floating,
+                        margin: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+                      ),
+                    );
+                    return true;
+                  }
+
+                  return false;
+                }
+
+                return false;
+              },
+              child: noteItem(note),
+            ),
+          ),
         ],
       ),
     );
@@ -367,10 +587,11 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Future<void> showAddNoteSheet(DateTime day) async {
-    final titleController = TextEditingController();
-    final descController = TextEditingController();
-    TimeOfDay? reminder;
+  Future<void> showAddNoteSheet(DateTime day, {PlannerNote? note}) async {
+    final titleController = TextEditingController(text: note?.title ?? '');
+    final descController = TextEditingController(text: note?.description ?? '');
+    TimeOfDay? reminder = note?.reminder;
+    final noteDate = note?.date ?? day;
 
     await showModalBottomSheet(
       context: context,
@@ -456,7 +677,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(width: 10),
                         Text(
-                          "${day.day}/${day.month}/${day.year}",
+                          "${noteDate.day}/${noteDate.month}/${noteDate.year}",
                           style: const TextStyle(fontWeight: FontWeight.w600),
                         ),
                       ],
@@ -581,22 +802,41 @@ class _HomeScreenState extends State<HomeScreen> {
                       onPressed: () async {
                         if (titleController.text.trim().isEmpty) return;
 
-                        final newNote = PlannerNote(
-                          id: "",
+                        final updatedNote = PlannerNote(
+                          id: note?.id ?? '',
                           title: titleController.text.trim(),
                           description: descController.text.trim(),
-                          date: day,
+                          date: noteDate,
                           reminder: reminder,
                         );
 
                         if (userId == null) return;
 
-                        await noteService.addNote(userId!, newNote);
+                        if (note == null) {
+                          await noteService.addNote(userId!, updatedNote);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: const Text('Note saved'),
+                              behavior: SnackBarBehavior.floating,
+                              margin: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+                            ),
+                          );
+                        } else {
+                          await noteService.updateNote(userId!, updatedNote);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: const Text('Note updated'),
+                              behavior: SnackBarBehavior.floating,
+                              margin: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+                            ),
+                          );
+                        }
+
                         Navigator.pop(context);
                       },
-                      child: const Text(
-                        "Save Note",
-                        style: TextStyle(
+                      child: Text(
+                        note == null ? "Save Note" : "Update Note",
+                        style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                           fontSize: 15,
@@ -774,39 +1014,50 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // 🔹 Quick Action Card
-  Widget actionCard(String title, IconData icon, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(0.15)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 6,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(9),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
-              borderRadius: BorderRadius.circular(12),
+  Widget actionCard(
+    String title,
+    IconData icon,
+    Color color, {
+    VoidCallback? onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: color.withOpacity(0.15)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 6,
+              offset: const Offset(0, 3),
             ),
-            child: Icon(icon, color: color, size: 20),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              title,
-              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(9),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, color: color, size: 20),
             ),
-          ),
-        ],
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                title,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

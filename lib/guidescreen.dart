@@ -2,7 +2,9 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import 'constants/colors.dart';
+import 'models/guidemodel.dart';
 import 'resultsscreen.dart';
+import 'services/guide_service.dart';
 
 class GuideScreen extends StatefulWidget {
   const GuideScreen({super.key});
@@ -12,24 +14,13 @@ class GuideScreen extends StatefulWidget {
 }
 
 class _GuideScreenState extends State<GuideScreen> {
+  List<GuideModel> guides = [];
+  bool isLoading = true;
+
   int selectedIndex = 0;
 
   late PageController _pageController;
   late ScrollController _tabScrollController;
-
-  @override
-  void initState() {
-    super.initState();
-    _pageController = PageController();
-    _tabScrollController = ScrollController();
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    _tabScrollController.dispose();
-    super.dispose();
-  }
 
   final List<String> tabs = [
     'tab_all',
@@ -39,28 +30,38 @@ class _GuideScreenState extends State<GuideScreen> {
     'tab_tips',
   ];
 
-  final List<Map<String, String>> articles = [
-    {
-      "titleKey": "article_rice_blast_title",
-      "descKey": "article_rice_blast_desc",
-      "image": "https://images.unsplash.com/photo-1501004318641-b39e6451bec6",
-    },
-    {
-      "titleKey": "article_fertilizer_title",
-      "descKey": "article_fertilizer_desc",
-      "image": "https://images.unsplash.com/photo-1501004318641-b39e6451bec6",
-    },
-    {
-      "titleKey": "article_diagnose_title",
-      "descKey": "article_diagnose_desc",
-      "image": "https://images.unsplash.com/photo-1501004318641-b39e6451bec6",
-    },
-    {
-      "titleKey": "article_diagnose_title",
-      "descKey": "article_diagnose_desc",
-      "image": "https://images.unsplash.com/photo-1501004318641-b39e6451bec6",
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+    _tabScrollController = ScrollController();
+    loadGuides();
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    _tabScrollController.dispose();
+    super.dispose();
+  }
+
+  Future<void> loadGuides() async {
+    try {
+      final data = await GuideService.fetchGuides();
+
+      if (!mounted) return;
+
+      setState(() {
+        guides = data;
+        isLoading = false;
+      });
+    } catch (e) {
+      print("ERROR LOAD GUIDES: $e");
+      if (!mounted) return;
+
+      setState(() => isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -87,18 +88,10 @@ class _GuideScreenState extends State<GuideScreen> {
                     Icon(Icons.search, color: Colors.grey.shade500),
                     const SizedBox(width: 8),
                     Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 7),
-                        child: TextField(
-                          decoration: InputDecoration(
-                            hintText: 'search'.tr(),
-                            hintStyle: const TextStyle(
-                              color: Colors.grey,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                            border: InputBorder.none,
-                          ),
+                      child: TextField(
+                        decoration: InputDecoration(
+                          hintText: 'search'.tr(),
+                          border: InputBorder.none,
                         ),
                       ),
                     ),
@@ -108,10 +101,11 @@ class _GuideScreenState extends State<GuideScreen> {
 
               const SizedBox(height: 16),
 
+              /// 🔹 Tabs
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: const Color(0xffEDEFF3), // nền xám nhạt
+                  color: const Color(0xffEDEFF3),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: SizedBox(
@@ -122,25 +116,16 @@ class _GuideScreenState extends State<GuideScreen> {
                     itemCount: tabs.length,
                     itemBuilder: (context, index) {
                       final isSelected = selectedIndex == index;
+
                       return GestureDetector(
                         onTap: () {
-                          final diff = (selectedIndex - index).abs();
+                          setState(() => selectedIndex = index);
 
-                          setState(() {
-                            selectedIndex = index;
-                          });
-
-                          _scrollToCenter(index); // 👈 thêm dòng này
-
-                          if (diff <= 1) {
-                            _pageController.animateToPage(
-                              index,
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeInOut,
-                            );
-                          } else {
-                            _pageController.jumpToPage(index);
-                          }
+                          _pageController.animateToPage(
+                            index,
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
                         },
                         child: Container(
                           margin: const EdgeInsets.only(right: 10),
@@ -150,15 +135,6 @@ class _GuideScreenState extends State<GuideScreen> {
                                 ? Colors.white
                                 : Colors.transparent,
                             borderRadius: BorderRadius.circular(10),
-                            boxShadow: isSelected
-                                ? [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.05),
-                                      blurRadius: 6,
-                                      offset: const Offset(0, 2),
-                                    ),
-                                  ]
-                                : [],
                           ),
                           alignment: Alignment.center,
                           child: Text(
@@ -168,9 +144,6 @@ class _GuideScreenState extends State<GuideScreen> {
                               fontWeight: isSelected
                                   ? FontWeight.bold
                                   : FontWeight.w500,
-                              fontSize: isSelected
-                                  ? 15
-                                  : 14, // optional: làm nổi hơn
                             ),
                           ),
                         ),
@@ -182,112 +155,95 @@ class _GuideScreenState extends State<GuideScreen> {
 
               const SizedBox(height: 16),
 
-              /// 📄 List bài viết
+              /// 📄 LIST
               Expanded(
-                child: PageView.builder(
-                  controller: _pageController,
-                  onPageChanged: (index) {
-                    setState(() {
-                      selectedIndex = index;
-                    });
+                child: isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : PageView.builder(
+                        controller: _pageController,
+                        onPageChanged: (index) {
+                          setState(() => selectedIndex = index);
+                        },
+                        itemCount: tabs.length,
+                        itemBuilder: (context, pageIndex) {
+                          return ListView.builder(
+                            padding: const EdgeInsets.only(top: 4),
+                            itemCount: guides.length,
+                            itemBuilder: (context, index) {
+                              final item = guides[index];
 
-                    _scrollToCenter(index); // 👈 thêm dòng này
-                  },
-                  itemCount: tabs.length,
-                  itemBuilder: (context, pageIndex) {
-                    return ListView.builder(
-                      padding: const EdgeInsets.only(top: 4),
-                      itemCount: articles.length,
-                      itemBuilder: (context, index) {
-                        final item = articles[index];
-                        return GestureDetector(
-                          onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) =>
-                                  ResultsScreen(type: ResultType.guide),
-                            ),
-                          ),
-                          child: Container(
-                            margin: const EdgeInsets.only(bottom: 12),
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: AppColors.backgroundlistTileColor,
-                              borderRadius: BorderRadius.circular(14),
-                              // boxShadow: [
-                              //   BoxShadow(
-                              //     color: Colors.black.withOpacity(0.04),
-                              //     blurRadius: 8,
-                              //     offset: const Offset(0, 3),
-                              //   ),
-                              // ],
-                            ),
-                            child: Row(
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: Image.network(
-                                    item["image"]!,
-                                    width: 80,
-                                    height: 80,
-                                    fit: BoxFit.cover,
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => ResultsScreen(
+                                        type: ResultType.guide,
+                                        guide: item,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  margin: const EdgeInsets.only(bottom: 12),
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.backgroundlistTileColor,
+                                    borderRadius: BorderRadius.circular(14),
                                   ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                  child: Row(
                                     children: [
-                                      Text(
-                                        item["titleKey"]!.tr(),
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 14,
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: Image.network(
+                                          // nếu API chưa có image -> dùng placeholder
+                                          // item.image ??
+                                          "https://images.unsplash.com/photo-1501004318641-b39e6451bec6",
+                                          width: 80,
+                                          height: 80,
+                                          fit: BoxFit.cover,
                                         ),
                                       ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        item["descKey"]!.tr(),
-                                        maxLines: 3,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                          color: Colors.grey.shade600,
-                                          fontSize: 12,
+                                      const SizedBox(width: 12),
+
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              item.title,
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              item.definition,
+                                              maxLines: 3,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                color: Colors.grey.shade600,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ],
                                   ),
                                 ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    );
-                  },
-                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
               ),
             ],
           ),
         ),
       ),
-    );
-  }
-
-  void _scrollToCenter(int index) {
-    double itemWidth = 80; // ước lượng width mỗi tab
-    double screenWidth = MediaQuery.of(context).size.width;
-
-    double offset = index * itemWidth - (screenWidth / 2) + (itemWidth / 2);
-
-    _tabScrollController.animateTo(
-      offset.clamp(
-        _tabScrollController.position.minScrollExtent,
-        _tabScrollController.position.maxScrollExtent,
-      ),
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
     );
   }
 }

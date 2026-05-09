@@ -60,247 +60,249 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      body: GestureDetector(
-        onTap: () => FocusScope.of(context).unfocus(),
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 32.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(height: MediaQuery.of(context).size.height * 0.04),
-                Image.asset(
-                  'assets/images/logo.jpg',
-                  height: 80,
-                  fit: BoxFit.cover,
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                Align(
-                  alignment: Alignment.center,
-                  child: Text(
-                    "create_account".tr(),
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primaryColor,
-                    ),
+      body: SingleChildScrollView(
+        child: GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 32.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.04),
+                  Image.asset(
+                    'assets/images/logo.jpg',
+                    height: 80,
+                    fit: BoxFit.cover,
                   ),
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.01),
-                RichText(
-                  textAlign: TextAlign.center,
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text: "join_text".tr(),
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.textNormalColor,
-                        ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                  Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      "create_account".tr(),
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primaryColor,
                       ),
-                      TextSpan(
-                        text: "app_name".tr(),
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: AppColors.logoNameColor,
-                          fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+                  RichText(
+                    textAlign: TextAlign.center,
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text: "join_text".tr(),
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.textNormalColor,
+                          ),
                         ),
-                      ),
-                      TextSpan(
-                        text: "register_description".tr(),
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.textNormalColor,
+                        TextSpan(
+                          text: "app_name".tr(),
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: AppColors.logoNameColor,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
+                        TextSpan(
+                          text: "register_description".tr(),
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.textNormalColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.04),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "username".tr(),
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black,
                       ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.04),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "username".tr(),
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black,
                     ),
                   ),
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.005),
-                MyTextField(
-                  obscureText: false,
-                  numBorder: 8,
-                  focusNode: _focusNode1,
-                  controller: _usernameController,
-                  hintText: "@example",
-                  keyboardType: TextInputType.text,
-                  textInputAction: TextInputAction.done,
-                  onSubmitted: (value) =>
-                      FocusScope.of(context).requestFocus(_focusNode2),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "enter_username".tr();
-                    }
-                    //  else if (!InputValidation().isEmailValid(value)) {
-                    //   return 'Invalid email';
-                    // }
-                    return null;
-                  },
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "email_address".tr(),
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.005),
-                MyTextField(
-                  obscureText: false,
-                  numBorder: 8,
-                  focusNode: _focusNode2,
-                  controller: _emailController,
-                  hintText: "example@gmail.com",
-                  keyboardType: TextInputType.emailAddress,
-                  textInputAction: TextInputAction.done,
-                  onSubmitted: (value) =>
-                      FocusScope.of(context).requestFocus(_focusNode3),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "enter_email".tr();
-                    }
-                    //  else if (!InputValidation().isEmailValid(value)) {
-                    //   return 'Invalid email';
-                    // }
-                    return null;
-                  },
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "password".tr(),
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.005),
-                MyTextField(
-                  numBorder: 8,
-                  obscureText: _obscureText,
-                  hintText: "password_hint".tr(),
-                  focusNode: _focusNode3,
-                  controller: _passwordController,
-                  keyboardType: TextInputType.visiblePassword,
-                  textInputAction: TextInputAction.done,
-                  suffixIcon: IconButton(
-                    color: AppColors.hintTextColor,
-                    onPressed: () {
-                      setState(() {
-                        _obscureText = !_obscureText;
-                      });
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.005),
+                  MyTextField(
+                    obscureText: false,
+                    numBorder: 8,
+                    focusNode: _focusNode1,
+                    controller: _usernameController,
+                    hintText: "@example",
+                    keyboardType: TextInputType.text,
+                    textInputAction: TextInputAction.done,
+                    onSubmitted: (value) =>
+                        FocusScope.of(context).requestFocus(_focusNode2),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "enter_username".tr();
+                      }
+                      //  else if (!InputValidation().isEmailValid(value)) {
+                      //   return 'Invalid email';
+                      // }
+                      return null;
                     },
-                    icon: Icon(
-                      _obscureText ? Icons.visibility_off : Icons.visibility,
+                  ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "email_address".tr(),
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black,
+                      ),
                     ),
                   ),
-                  onSubmitted: (value) =>
-                      FocusScope.of(context).requestFocus(_focusNode3),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "enter_password".tr();
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "confirm_password".tr(),
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.005),
-                MyTextField(
-                  numBorder: 8,
-                  obscureText: _obscureText,
-                  hintText: "password_hint".tr(),
-                  focusNode: _focusNode4,
-                  controller: _passwordCfController,
-                  keyboardType: TextInputType.visiblePassword,
-                  textInputAction: TextInputAction.done,
-                  suffixIcon: IconButton(
-                    color: AppColors.hintTextColor,
-                    onPressed: () {
-                      setState(() {
-                        _obscureText = !_obscureText;
-                      });
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.005),
+                  MyTextField(
+                    obscureText: false,
+                    numBorder: 8,
+                    focusNode: _focusNode2,
+                    controller: _emailController,
+                    hintText: "example@gmail.com",
+                    keyboardType: TextInputType.emailAddress,
+                    textInputAction: TextInputAction.done,
+                    onSubmitted: (value) =>
+                        FocusScope.of(context).requestFocus(_focusNode3),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "enter_email".tr();
+                      }
+                      //  else if (!InputValidation().isEmailValid(value)) {
+                      //   return 'Invalid email';
+                      // }
+                      return null;
                     },
-                    icon: Icon(
-                      _obscureText ? Icons.visibility_off : Icons.visibility,
+                  ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "password".tr(),
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black,
+                      ),
                     ),
                   ),
-                  onSubmitted: (value) => FocusScope.of(context).unfocus(),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "enter_password".tr();
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.05),
-                BtnText(
-                  width: double.infinity,
-                  text: "sign_up".tr(),
-                  onPressed: () => onRegister(),
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.04),
-                RichText(
-                  textAlign: TextAlign.center,
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text: "already_have_account".tr(),
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.textNormalColor,
-                        ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.005),
+                  MyTextField(
+                    numBorder: 8,
+                    obscureText: _obscureText,
+                    hintText: "password_hint".tr(),
+                    focusNode: _focusNode3,
+                    controller: _passwordController,
+                    keyboardType: TextInputType.visiblePassword,
+                    textInputAction: TextInputAction.done,
+                    suffixIcon: IconButton(
+                      color: AppColors.hintTextColor,
+                      onPressed: () {
+                        setState(() {
+                          _obscureText = !_obscureText;
+                        });
+                      },
+                      icon: Icon(
+                        _obscureText ? Icons.visibility_off : Icons.visibility,
                       ),
-                      TextSpan(
-                        recognizer: TapGestureRecognizer()
-                          ..onTap = widget.showLoginPage,
-                        text: "sign_in".tr(),
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: AppColors.primaryColor,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
+                    ),
+                    onSubmitted: (value) =>
+                        FocusScope.of(context).requestFocus(_focusNode3),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "enter_password".tr();
+                      }
+                      return null;
+                    },
                   ),
-                ),
-                // SizedBox(height: MediaQuery.of(context).size.height * 0.03),
-              ],
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "confirm_password".tr(),
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.005),
+                  MyTextField(
+                    numBorder: 8,
+                    obscureText: _obscureText,
+                    hintText: "password_hint".tr(),
+                    focusNode: _focusNode4,
+                    controller: _passwordCfController,
+                    keyboardType: TextInputType.visiblePassword,
+                    textInputAction: TextInputAction.done,
+                    suffixIcon: IconButton(
+                      color: AppColors.hintTextColor,
+                      onPressed: () {
+                        setState(() {
+                          _obscureText = !_obscureText;
+                        });
+                      },
+                      icon: Icon(
+                        _obscureText ? Icons.visibility_off : Icons.visibility,
+                      ),
+                    ),
+                    onSubmitted: (value) => FocusScope.of(context).unfocus(),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "enter_password".tr();
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.05),
+                  BtnText(
+                    width: double.infinity,
+                    text: "sign_up".tr(),
+                    onPressed: () => onRegister(),
+                  ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.04),
+                  RichText(
+                    textAlign: TextAlign.center,
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text: "already_have_account".tr(),
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.textNormalColor,
+                          ),
+                        ),
+                        TextSpan(
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = widget.showLoginPage,
+                          text: "sign_in".tr(),
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: AppColors.primaryColor,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // SizedBox(height: MediaQuery.of(context).size.height * 0.03),
+                ],
+              ),
             ),
           ),
         ),

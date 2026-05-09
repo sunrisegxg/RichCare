@@ -19,6 +19,11 @@ class ProfileScreenUI extends StatefulWidget {
 class _ProfileScreenUIState extends State<ProfileScreenUI> {
   bool isNotificationEnabled = false;
   void logout(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    // reset notification về mặc định
+    await prefs.setBool('notification_enabled', false);
+
     final token = await TokenService.get();
 
     if (token != null) {
@@ -53,6 +58,16 @@ class _ProfileScreenUIState extends State<ProfileScreenUI> {
     final prefs = await SharedPreferences.getInstance();
 
     if (value) {
+      final systemEnabled = await NotificationService.isEnabled();
+
+      // đã có quyền từ trước
+      if (systemEnabled) {
+        setState(() => isNotificationEnabled = true);
+        await prefs.setBool('notification_enabled', true);
+        return;
+      }
+
+      // chưa có quyền thì xin
       final granted = await NotificationService.requestPermission();
 
       if (granted) {

@@ -27,7 +27,7 @@ class _CheckMailScreenState extends State<CheckMailScreen> {
             children: [
               SizedBox(height: MediaQuery.of(context).size.height * 0.04),
               Image.asset(
-                'assets/images/logo.jpg',
+                'assets/images/logo.jpeg',
                 height: 80,
                 fit: BoxFit.cover,
               ),

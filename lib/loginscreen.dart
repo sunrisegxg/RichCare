@@ -76,7 +76,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: [
                   SizedBox(height: MediaQuery.of(context).size.height * 0.08),
                   Image.asset(
-                    'assets/images/logo.jpg',
+                    'assets/images/logo.jpeg',
                     height: 80,
                     fit: BoxFit.cover,
                   ),
@@ -106,12 +106,24 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         TextSpan(
-                          text: "app_name".tr(),
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: AppColors.logoNameColor,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          children: [
+                            TextSpan(
+                              text: "Rice",
+                              style: TextStyle(
+                                color: Colors.green,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            TextSpan(
+                              text: "Care",
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),

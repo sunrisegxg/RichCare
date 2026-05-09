@@ -89,24 +89,33 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                       child: Column(
                         children: [
                           //logo
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "app_name".tr(),
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: AppColors.logoNameColor,
-                                  fontWeight: FontWeight.bold,
+                          Image.asset(
+                            'assets/images/logo.jpeg',
+                            height: 60,
+                            fit: BoxFit.cover,
+                          ),
+                          SizedBox(height: 4),
+                          RichText(
+                            text: const TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: "Rice",
+                                  style: TextStyle(
+                                    color: Colors.green,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                              ),
-                              SizedBox(width: 8),
-                              Image.asset(
-                                'assets/images/logo.jpg',
-                                height: 40,
-                                fit: BoxFit.cover,
-                              ),
-                            ],
+                                TextSpan(
+                                  text: "Care",
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                           SizedBox(height: 24),
                           // title
@@ -118,7 +127,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                               color: AppColors.primaryColor,
                             ),
                           ),
-                          SizedBox(height: 16),
+                          SizedBox(height: 8),
                           // description
                           RichText(
                             textAlign: TextAlign.center,
@@ -126,12 +135,24 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                               children: [
                                 index == 0
                                     ? TextSpan(
-                                        text: "app_name".tr(),
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          color: AppColors.logoNameColor,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                        children: [
+                                          TextSpan(
+                                            text: "Rice",
+                                            style: TextStyle(
+                                              color: Colors.green,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          TextSpan(
+                                            text: "Care",
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
                                       )
                                     : TextSpan(),
                                 TextSpan(

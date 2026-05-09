@@ -5,11 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:ricecare/constants/colors.dart';
 import 'package:ricecare/profileuiscreen.dart';
 import 'package:ricecare/scanscreen.dart';
+import 'package:ricecare/services/location_service.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import 'models/notemodel.dart';
 import 'services/planner_service.dart';
 import 'services/token_service.dart';
+import 'services/weather_service.dart';
 
 class HomeScreen extends StatefulWidget {
   final ValueChanged<int>? onTabSelected;
@@ -21,6 +24,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  Map<String, dynamic>? weather;
+  bool loadingWeather = true;
   String? userId;
   final noteService = PlannerService();
   DateTime focusedDay = DateTime.now();
@@ -33,6 +38,22 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     loadUser();
+    loadWeather();
+  }
+
+  Future<void> loadWeather() async {
+    final pos = await LocationService().getPosition();
+
+    if (pos == null) return;
+
+    final data = await WeatherService().getWeather(pos.latitude, pos.longitude);
+
+    if (!mounted) return;
+
+    setState(() {
+      weather = data;
+      loadingWeather = false;
+    });
   }
 
   DateTime normalize(DateTime day) {
@@ -884,6 +905,60 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget weatherCard() {
+    final now = DateTime.now();
+    final isVi = context.locale.languageCode == 'vi';
+
+    final formattedTime = DateFormat(
+      'dd/MM/yyyy hh:mm a',
+      isVi ? 'vi_VN' : 'en_US',
+    ).format(now);
+    if (loadingWeather) {
+      return Shimmer.fromColors(
+        baseColor: Colors.grey.shade300,
+        highlightColor: Colors.grey.shade100,
+        child: Container(
+          width: double.infinity,
+          height: 240,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(22),
+          ),
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              Container(height: 20, width: 120, color: Colors.white),
+              const SizedBox(height: 20),
+              Container(height: 80, width: 80, color: Colors.white),
+              const SizedBox(height: 20),
+              Container(height: 30, width: 100, color: Colors.white),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Container(width: 40, height: 40, color: Colors.white),
+                  Container(width: 40, height: 40, color: Colors.white),
+                  Container(width: 40, height: 40, color: Colors.white),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (weather == null) {
+      return const Text("Không lấy được thời tiết");
+    }
+
+    final temp = weather!['main']['temp'];
+    final humidity = weather!['main']['humidity'];
+    final wind = weather!['wind']['speed'];
+    final conditionKey = weather!['weather'][0]['main']
+        .toString()
+        .toLowerCase();
+    final icon = weather!['weather'][0]['icon'];
+    final rain = weather?['rain_mm'] ?? 0.0;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -904,27 +979,27 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       child: Column(
         children: [
-          /// 🔹 TOP 50 / 50
+          /// 🔹 TOP 50 / 50 (GIỮ UI CŨ)
           Row(
             children: [
-              /// LEFT ICON
               Expanded(
                 child: SizedBox(
                   height: 120,
                   child: Center(
-                    child: Image.asset("assets/images/cloudy.png", height: 90),
+                    child: Image.network(
+                      "https://openweathermap.org/img/wn/$icon@4x.png",
+                      height: 90,
+                    ),
                   ),
                 ),
               ),
 
-              /// Divider giữa
               Container(
                 width: 1,
                 height: 95,
                 color: Colors.white.withOpacity(0.25),
               ),
 
-              /// RIGHT INFO
               Expanded(
                 child: SizedBox(
                   height: 120,
@@ -941,11 +1016,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
 
-                        SizedBox(height: 6),
+                        const SizedBox(height: 6),
 
                         Text(
-                          "27°",
-                          style: TextStyle(
+                          "${temp.round()}°",
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 42,
                             fontWeight: FontWeight.bold,
@@ -953,18 +1028,22 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
 
-                        SizedBox(height: 6),
+                        const SizedBox(height: 6),
 
                         Text(
-                          "weather_condition".tr(),
-                          style: TextStyle(color: Colors.white70, fontSize: 12),
+                          "weather.$conditionKey".tr(),
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 12,
+                          ),
                         ),
-
-                        SizedBox(height: 4),
-
+                        const SizedBox(height: 4),
                         Text(
-                          "date".tr(),
-                          style: TextStyle(color: Colors.white60, fontSize: 11),
+                          formattedTime,
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 12,
+                          ),
                         ),
                       ],
                     ),
@@ -981,20 +1060,24 @@ class _HomeScreenState extends State<HomeScreen> {
 
           const SizedBox(height: 14),
 
-          /// 🔹 Bottom Info
+          /// 🔹 Bottom Info (GIỮ UI CŨ)
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              weatherInfoBlue("assets/images/wind.png", "wind".tr(), "7 km/h"),
+              weatherInfoBlue(
+                "assets/images/wind.png",
+                "wind".tr(),
+                "${wind.toStringAsFixed(1)} m/s",
+              ),
               weatherInfoBlue(
                 "assets/images/humidity.png",
                 "humidity".tr(),
-                "82%",
+                "$humidity%",
               ),
               weatherInfoBlue(
-                "assets/images/protection.png",
+                "assets/images/rain.png",
                 "rain".tr(),
-                "20%",
+                "$rain mm",
               ),
             ],
           ),

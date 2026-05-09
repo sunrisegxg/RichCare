@@ -81,6 +81,10 @@
   "invalid_credentials": "Sai tài khoản hoặc mật khẩu",
   "change_language": "Change Language",
   "select_language": "Select Language",
+  "language_vietnamese": "Tiếng Việt",
+  "language_vietnamese_subtitle": "Vietnamese",
+  "language_english": "English",
+  "language_english_subtitle": "English",
   "profile": "Profile",
   "account_setting": "Account Setting",
   "edit_profile": "Edit profile",
@@ -143,5 +147,13 @@
   "re_scan": "Re-scan",
   "share_result": "Share result",
   "save_this_plant": "Save this plant",
-  "register_description": " and start detecting rice diseases with AI."
+  "register_description": " and start detecting rice diseases with AI.",
+  "weather": {
+    "clear": "Clear",
+    "clouds": "Cloudy",
+    "rain": "Rainy",
+    "drizzle": "Drizzle",
+    "thunderstorm": "Thunderstorm",
+    "snow": "Snow"
+  }
 }

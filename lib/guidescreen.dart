@@ -36,7 +36,6 @@ class _GuideScreenState extends State<GuideScreen> {
     'tab_diseases',
     'tab_farming',
     'tab_fertilizer',
-    'tab_pest',
     'tab_tips',
   ];
 

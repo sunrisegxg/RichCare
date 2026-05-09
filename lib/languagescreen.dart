@@ -95,7 +95,7 @@ class LanguageScreen extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Tiếng Việt',
+                                  'language_vietnamese'.tr(),
                                   style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
@@ -108,7 +108,7 @@ class LanguageScreen extends StatelessWidget {
                                 const SizedBox(height: 4),
 
                                 Text(
-                                  'Vietnamese',
+                                  'language_vietnamese_subtitle'.tr(),
                                   style: TextStyle(
                                     fontSize: 14,
                                     color: Colors.grey[600],
@@ -174,7 +174,7 @@ class LanguageScreen extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'English',
+                                  'language_english'.tr(),
                                   style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
@@ -187,7 +187,7 @@ class LanguageScreen extends StatelessWidget {
                                 const SizedBox(height: 4),
 
                                 Text(
-                                  'English',
+                                  'language_english_subtitle'.tr(),
                                   style: TextStyle(
                                     fontSize: 14,
                                     color: Colors.grey[600],

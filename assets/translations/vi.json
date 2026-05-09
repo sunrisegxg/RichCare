@@ -82,6 +82,10 @@
   "invalid_credentials": "Sai tài khoản hoặc mật khẩu",
   "change_language": "Thay đổi ngôn ngữ",
   "select_language": "Chọn ngôn ngữ",
+  "language_vietnamese": "Tiếng Việt",
+  "language_vietnamese_subtitle": "Vietnamese",
+  "language_english": "English",
+  "language_english_subtitle": "English",
   "profile": "Hồ sơ",
   "account_setting": "Cài đặt tài khoản",
   "edit_profile": "Chỉnh sửa hồ sơ",
@@ -144,5 +148,13 @@
   "re_scan": "Quét lại",
   "share_result": "Chia sẻ kết quả",
   "save_this_plant": "Lưu cây này",
-  "register_description": " và bắt đầu phát hiện bệnh lúa với AI."
+  "register_description": " và bắt đầu phát hiện bệnh lúa với AI.",
+   "weather": {
+    "clear": "Trời quang",
+    "clouds": "Nhiều mây",
+    "rain": "Có mưa",
+    "drizzle": "Mưa phùn",
+    "thunderstorm": "Giông bão",
+    "snow": "Tuyết"
+  }
 }

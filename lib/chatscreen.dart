@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -36,7 +37,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     child: Center(
                       child: RichText(
                         text: TextSpan(
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
                           ),
@@ -76,27 +77,19 @@ class _ChatScreenState extends State<ChatScreen> {
               child: ListView(
                 padding: EdgeInsets.all(16),
                 children: [
-                  chatBubble(
-                    isMe: false,
-                    text:
-                        "Hello 👋\nI'm RiceCare AI\nAsk me anything about rice diseases, symptoms and treatment",
-                  ),
+                  chatBubble(isMe: false, text: 'chat_welcome'.tr()),
 
-                  chatBubble(isMe: true, text: "How to treat rice blast?"),
+                  chatBubble(isMe: true, text: 'chat_sample_question'.tr()),
 
-                  chatBubble(
-                    isMe: false,
-                    text:
-                        "Rice Blast is a fungal disease caused by Magnaporthe oryzae.\n\nTreatment:\n• Reduce plant density\n• Use fungicide\n• Improve drainage",
-                  ),
+                  chatBubble(isMe: false, text: 'chat_sample_answer'.tr()),
 
                   chatBubble(isMe: true, text: "Thank you! ❤️"),
 
                   SizedBox(height: 16),
 
                   Text(
-                    "Quick Suggestions",
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    'quick_suggestions'.tr(),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
 
                   SizedBox(height: 10),
@@ -105,10 +98,22 @@ class _ChatScreenState extends State<ChatScreen> {
                     spacing: 8,
                     runSpacing: 8,
                     children: [
-                      suggestionChip("Rice Blast Treatment", Color(0xFFEDF8EC)),
-                      suggestionChip("Brown Spot", Color(0xFFF8EFEC)),
-                      suggestionChip("Prevent Disease", Color(0xFFECF6F8)),
-                      suggestionChip("Yellow Leaves", Color(0xFFFEF9EF)),
+                      suggestionChip(
+                        'suggestion_rice_blast_treatment',
+                        Color(0xFFEDF8EC),
+                      ),
+                      suggestionChip(
+                        'suggestion_brown_spot',
+                        Color(0xFFF8EFEC),
+                      ),
+                      suggestionChip(
+                        'suggestion_prevent_disease',
+                        Color(0xFFECF6F8),
+                      ),
+                      suggestionChip(
+                        'suggestion_yellow_leaves',
+                        Color(0xFFFEF9EF),
+                      ),
                     ],
                   ),
                 ],
@@ -153,14 +158,14 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  Widget suggestionChip(String text, Color color) {
+  Widget suggestionChip(String textKey, Color color) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: color,
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Text(text),
+      child: Text(textKey.tr()),
     );
   }
 
@@ -185,7 +190,7 @@ class _ChatScreenState extends State<ChatScreen> {
           Expanded(
             child: TextField(
               decoration: InputDecoration(
-                hintText: "Ask me something...",
+                hintText: 'ask_me_something'.tr(),
                 border: InputBorder.none,
               ),
             ),

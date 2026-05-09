@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:ricecare/components/btn_text.dart';
@@ -79,7 +80,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 Align(
                   alignment: Alignment.center,
                   child: Text(
-                    "Create account",
+                    "create_account".tr(),
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -93,7 +94,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   text: TextSpan(
                     children: [
                       TextSpan(
-                        text: "Join ",
+                        text: "join_text".tr(),
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w500,
@@ -101,7 +102,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       ),
                       TextSpan(
-                        text: "RiceCare",
+                        text: "app_name".tr(),
                         style: TextStyle(
                           fontSize: 18,
                           color: AppColors.logoNameColor,
@@ -109,7 +110,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       ),
                       TextSpan(
-                        text: " and start detecting rice diseases with AI.",
+                        text: "register_description".tr(),
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w500,
@@ -123,7 +124,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    "Username*",
+                    "username".tr(),
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
@@ -144,7 +145,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       FocusScope.of(context).requestFocus(_focusNode2),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return "Please enter your username";
+                      return "enter_username".tr();
                     }
                     //  else if (!InputValidation().isEmailValid(value)) {
                     //   return 'Invalid email';
@@ -156,7 +157,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    "Email address*",
+                    "email_address".tr(),
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
@@ -177,7 +178,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       FocusScope.of(context).requestFocus(_focusNode3),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return "Please enter your email";
+                      return "enter_email".tr();
                     }
                     //  else if (!InputValidation().isEmailValid(value)) {
                     //   return 'Invalid email';
@@ -189,7 +190,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    "Password*",
+                    "password".tr(),
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
@@ -201,7 +202,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 MyTextField(
                   numBorder: 8,
                   obscureText: _obscureText,
-                  hintText: "Bfnsj12@dj#",
+                  hintText: "password_hint".tr(),
                   focusNode: _focusNode3,
                   controller: _passwordController,
                   keyboardType: TextInputType.visiblePassword,
@@ -221,7 +222,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       FocusScope.of(context).requestFocus(_focusNode3),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return "Please enter your password";
+                      return "enter_password".tr();
                     }
                     return null;
                   },
@@ -230,7 +231,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    "Confirm password*",
+                    "confirm_password".tr(),
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
@@ -242,7 +243,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 MyTextField(
                   numBorder: 8,
                   obscureText: _obscureText,
-                  hintText: "Bfnsj12@dj#",
+                  hintText: "password_hint".tr(),
                   focusNode: _focusNode4,
                   controller: _passwordCfController,
                   keyboardType: TextInputType.visiblePassword,
@@ -261,7 +262,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   onSubmitted: (value) => FocusScope.of(context).unfocus(),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return "Please enter your password";
+                      return "enter_password".tr();
                     }
                     return null;
                   },
@@ -269,7 +270,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 SizedBox(height: MediaQuery.of(context).size.height * 0.05),
                 BtnText(
                   width: double.infinity,
-                  text: "Sign up",
+                  text: "sign_up".tr(),
                   onPressed: () => onRegister(),
                 ),
                 SizedBox(height: MediaQuery.of(context).size.height * 0.04),
@@ -278,7 +279,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   text: TextSpan(
                     children: [
                       TextSpan(
-                        text: "Already have an account? ",
+                        text: "already_have_account".tr(),
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w500,
@@ -288,7 +289,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       TextSpan(
                         recognizer: TapGestureRecognizer()
                           ..onTap = widget.showLoginPage,
-                        text: "Sign in",
+                        text: "sign_in".tr(),
                         style: TextStyle(
                           fontSize: 18,
                           color: AppColors.primaryColor,

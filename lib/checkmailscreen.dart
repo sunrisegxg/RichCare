@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:ricecare/authswitcherscreen.dart';
 
@@ -34,7 +35,7 @@ class _CheckMailScreenState extends State<CheckMailScreen> {
               Align(
                 alignment: Alignment.center,
                 child: Text(
-                  "Check your email",
+                  'check_email'.tr(),
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -44,7 +45,7 @@ class _CheckMailScreenState extends State<CheckMailScreen> {
               ),
               SizedBox(height: MediaQuery.of(context).size.height * 0.01),
               Text(
-                'We have sent a password recovery instruction to your email',
+                'password_recovery_sent'.tr(),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 18,
@@ -55,7 +56,7 @@ class _CheckMailScreenState extends State<CheckMailScreen> {
               SizedBox(height: MediaQuery.of(context).size.height * 0.04),
               BtnText(
                 width: double.infinity,
-                text: "Back to Login",
+                text: 'back_to_login'.tr(),
                 onPressed: () => Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (_) => AuthSwitcherScreen()),

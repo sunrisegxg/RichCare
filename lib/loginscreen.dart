@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:ricecare/components/btn_text.dart';
@@ -43,9 +44,9 @@ class _LoginScreenState extends State<LoginScreen> {
         MaterialPageRoute(builder: (_) => Test()),
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Sai tài khoản hoặc mật khẩu")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("invalid_credentials".tr())));
     }
   }
 
@@ -73,7 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.04),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.08),
                   Image.asset(
                     'assets/images/logo.jpg',
                     height: 80,
@@ -83,7 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   Align(
                     alignment: Alignment.center,
                     child: Text(
-                      "Welcome back!",
+                      "welcome_back".tr(),
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -97,8 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     text: TextSpan(
                       children: [
                         TextSpan(
-                          text:
-                              "Sign in to continue protecting your rice crops with ",
+                          text: "sign_in_description".tr(),
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w500,
@@ -106,7 +106,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         TextSpan(
-                          text: "RiceCare",
+                          text: "app_name".tr(),
                           style: TextStyle(
                             fontSize: 18,
                             color: AppColors.logoNameColor,
@@ -120,7 +120,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "Email address*",
+                      "email_address".tr(),
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
@@ -134,14 +134,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     numBorder: 8,
                     focusNode: _focusNode1,
                     controller: _emailController,
-                    hintText: "example@gmail.com",
+                    hintText: "email_hint".tr(),
                     keyboardType: TextInputType.emailAddress,
                     textInputAction: TextInputAction.done,
                     onSubmitted: (value) =>
                         FocusScope.of(context).requestFocus(_focusNode2),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return "Please enter your email";
+                        return "enter_email".tr();
                       }
                       //  else if (!InputValidation().isEmailValid(value)) {
                       //   return 'Invalid email';
@@ -153,7 +153,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "Password*",
+                      "password".tr(),
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
@@ -165,7 +165,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   MyTextField(
                     numBorder: 8,
                     obscureText: _obscureText,
-                    hintText: "Bfnsj12@dj#",
+                    hintText: "password_hint".tr(),
                     focusNode: _focusNode2,
                     controller: _passwordController,
                     keyboardType: TextInputType.visiblePassword,
@@ -184,7 +184,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     onSubmitted: (value) => FocusScope.of(context).unfocus(),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return "Please enter your password";
+                        return "enter_password".tr();
                       }
                       return null;
                     },
@@ -197,7 +197,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         MaterialPageRoute(builder: (context) => ForgotScreen()),
                       ),
                       child: Text(
-                        'Forgot password?',
+                        'forgot_password'.tr(),
                         style: TextStyle(
                           fontSize: 16,
                           color: AppColors.primaryColor,
@@ -209,7 +209,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                   BtnText(
                     width: double.infinity,
-                    text: isLoading ? "..." : "Sign in",
+                    text: isLoading ? "..." : "sign_in".tr(),
                     onPressed: isLoading ? null : login,
                   ),
                   SizedBox(height: MediaQuery.of(context).size.height * 0.02),
@@ -227,7 +227,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           horizontal: MediaQuery.of(context).size.width * 0.02,
                         ),
                         child: Text(
-                          "Or continue with",
+                          "or_continue_with".tr(),
                           style: TextStyle(
                             color: AppColors.primaryColor,
                             fontSize: 16,
@@ -249,7 +249,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     children: [
                       BtnSocial(
                         imagePath: 'assets/images/google.png',
-                        text: "Google",
+                        text: "google".tr(),
                         onPressed: () async {
                           final google = GoogleAuthService();
                           final authRepo = AuthRepository();
@@ -259,8 +259,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
                             if (idToken == null) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text("Google login cancelled"),
+                                SnackBar(
+                                  content: Text("google_login_cancelled".tr()),
                                 ),
                               );
                               return;
@@ -277,16 +277,16 @@ class _LoginScreenState extends State<LoginScreen> {
                               );
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text("Login failed from server"),
-                                ),
+                                SnackBar(content: Text("login_failed".tr())),
                               );
                             }
                           } catch (e) {
                             print("Google login error: $e");
 
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("Error: $e")),
+                              SnackBar(
+                                content: Text("error".tr(args: [e.toString()])),
+                              ),
                             );
                           }
                         },
@@ -305,7 +305,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     text: TextSpan(
                       children: [
                         TextSpan(
-                          text: "Don't have an account? ",
+                          text: "no_account".tr(),
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w500,
@@ -315,7 +315,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         TextSpan(
                           recognizer: TapGestureRecognizer()
                             ..onTap = widget.showRegisterPage,
-                          text: "Sign up",
+                          text: "sign_up".tr(),
                           style: TextStyle(
                             fontSize: 18,
                             color: AppColors.primaryColor,

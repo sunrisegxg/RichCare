@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'constants/colors.dart';
 import 'models/historymodel.dart';
@@ -87,9 +88,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Text(
-            "History",
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          Text(
+            'history'.tr(),
+            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
           ),
 
           // 🔥 KHUNG NÚT MENU
@@ -142,8 +143,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
             Row(
               children: [
-                Expanded(child: buildTab("Today", 0)),
-                Expanded(child: buildTab("All", 1)),
+                Expanded(child: buildTab('tab_today'.tr(), 0)),
+                Expanded(child: buildTab('tab_all'.tr(), 1)),
               ],
             ),
           ],
@@ -188,7 +189,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     }).toList();
 
     if (todayList.isEmpty) {
-      return const Center(child: Text("No history today"));
+      return Center(child: Text('no_history_today'.tr()));
     }
 
     return ListView.builder(
@@ -203,7 +204,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   // ================= ALL =================
   Widget buildAllList() {
     if (historyList.isEmpty) {
-      return const Center(child: Text("No history yet"));
+      return Center(child: Text('no_history_yet'.tr()));
     }
 
     return ListView.builder(
@@ -263,7 +264,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    "Confidence: ${item.confidence}",
+                    '${'confidence'.tr()}: ${item.confidence}',
                     style: const TextStyle(fontSize: 12, color: Colors.grey),
                   ),
                 ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:readmore/readmore.dart';
 import 'package:ricecare/constants/colors.dart';
@@ -121,8 +122,8 @@ class _ResultsScreenState extends State<ResultsScreen> {
                             SizedBox(width: 6),
                             Text(
                               isHistory
-                                  ? "Analysis Result"
-                                  : "Hurray, we identified the disease!",
+                                  ? "analysis_result".tr()
+                                  : "hurray_identified".tr(),
                               style: TextStyle(
                                 color: AppColors.primaryColor,
                                 fontWeight: FontWeight.bold,
@@ -162,21 +163,21 @@ class _ResultsScreenState extends State<ResultsScreen> {
                       Wrap(
                         spacing: 8,
                         children: [
-                          chip("Rice Disease"),
-                          chip("Fungal Infection"),
-                          chip("Common Disease"),
+                          chip("rice_disease".tr()),
+                          chip("fungal_infection".tr()),
+                          chip("common_disease".tr()),
                         ],
                       ),
 
                       SizedBox(height: 16),
 
-                      sectionTitle("Description"),
+                      sectionTitle("description".tr()),
                       ReadMoreText(
-                        "Rice blast is a common fungal disease that affects rice plants. It can damage leaves, stems, and grains, causing serious yield loss. Early detection and proper treatment are important to protect crops and maintain productivity in rice farming.",
+                        "rice_blast_description".tr(),
                         trimLines: 2,
                         trimMode: TrimMode.Line,
-                        trimCollapsedText: ' Read more',
-                        trimExpandedText: ' Show less',
+                        trimCollapsedText: 'read_more'.tr(),
+                        trimExpandedText: 'show_less'.tr(),
                         style: const TextStyle(
                           fontSize: 14,
                           color: Colors.black87,
@@ -195,21 +196,21 @@ class _ResultsScreenState extends State<ResultsScreen> {
                       ),
                       SizedBox(height: 16),
 
-                      sectionTitle("Symptoms"),
-                      bullet("White or gray lesions on leaves"),
-                      bullet("Leaves may dry"),
+                      sectionTitle("symptoms".tr()),
+                      bullet("symptom_lesions".tr()),
+                      bullet("symptom_leaves_dry".tr()),
 
                       SizedBox(height: 16),
 
-                      sectionTitle("Cause"),
-                      Text("Fungal infection caused by Magnaporthe oryzae."),
+                      sectionTitle("cause".tr()),
+                      Text("cause_description".tr()),
 
                       SizedBox(height: 16),
 
-                      sectionTitle("Recommendation"),
-                      bullet("Reduce plant density"),
-                      bullet("Use fungicide"),
-                      bullet("Improve drainage"),
+                      sectionTitle("recommendation".tr()),
+                      bullet("rec_reduce_density".tr()),
+                      bullet("rec_use_fungicide".tr()),
+                      bullet("rec_improve_drainage".tr()),
 
                       SizedBox(height: 20),
 
@@ -221,7 +222,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                         children: [
                           Expanded(
                             child: infoBox(
-                              "Severity",
+                              "severity".tr(),
                               "Medium",
                               Colors.orange,
                               Icons.local_fire_department,
@@ -232,7 +233,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
 
                           Expanded(
                             child: infoBox(
-                              "Spread Risk",
+                              "spread_risk".tr(),
                               "High",
                               Colors.red,
                               Icons.warning_amber_rounded,
@@ -247,7 +248,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                         children: [
                           Expanded(
                             child: infoBox(
-                              "Confidence",
+                              "confidence".tr(),
                               "92%",
                               Colors.green,
                               Icons.verified_rounded,
@@ -258,7 +259,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
 
                           Expanded(
                             child: infoBox(
-                              "Humidity",
+                              "humidity".tr(),
                               "High",
                               Colors.blue,
                               Icons.water_drop_rounded,
@@ -293,7 +294,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                                   ),
                                 ),
                                 child: Text(
-                                  isHistory ? "Delete" : "Re-scan",
+                                  isHistory ? "delete".tr() : "re_scan".tr(),
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
@@ -322,8 +323,8 @@ class _ResultsScreenState extends State<ResultsScreen> {
                                     SizedBox(width: 8),
                                     Text(
                                       isHistory
-                                          ? "Share result"
-                                          : "Save this plant",
+                                          ? "share_result".tr()
+                                          : "save_this_plant".tr(),
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                       ),

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import 'constants/colors.dart';
@@ -31,37 +32,33 @@ class _GuideScreenState extends State<GuideScreen> {
   }
 
   final List<String> tabs = [
-    "All",
-    "Diseases",
-    "Farming",
-    "Fertilizer",
-    "Pest",
-    "Tips",
+    'tab_all',
+    'tab_diseases',
+    'tab_farming',
+    'tab_fertilizer',
+    'tab_pest',
+    'tab_tips',
   ];
 
   final List<Map<String, String>> articles = [
     {
-      "title": "Rice Blast Disease",
-      "desc":
-          "How to detect rice blast early to detect rice blast early to detect rice blast early",
+      "titleKey": "article_rice_blast_title",
+      "descKey": "article_rice_blast_desc",
       "image": "https://images.unsplash.com/photo-1501004318641-b39e6451bec6",
     },
     {
-      "title": "Fertilizer Schedule for Rice",
-      "desc":
-          "How to detect rice blast early to detect rice blast early to detect rice blast early",
+      "titleKey": "article_fertilizer_title",
+      "descKey": "article_fertilizer_desc",
       "image": "https://images.unsplash.com/photo-1501004318641-b39e6451bec6",
     },
     {
-      "title": "Diagnose",
-      "desc":
-          "How to detect rice blast early to detect rice blast early to detect rice blast early",
+      "titleKey": "article_diagnose_title",
+      "descKey": "article_diagnose_desc",
       "image": "https://images.unsplash.com/photo-1501004318641-b39e6451bec6",
     },
     {
-      "title": "Diagnose",
-      "desc":
-          "How to detect rice blast early to detect rice blast early to detect rice blast early",
+      "titleKey": "article_diagnose_title",
+      "descKey": "article_diagnose_desc",
       "image": "https://images.unsplash.com/photo-1501004318641-b39e6451bec6",
     },
   ];
@@ -95,8 +92,8 @@ class _GuideScreenState extends State<GuideScreen> {
                         padding: const EdgeInsets.only(bottom: 7),
                         child: TextField(
                           decoration: InputDecoration(
-                            hintText: "Search...",
-                            hintStyle: TextStyle(
+                            hintText: 'search'.tr(),
+                            hintStyle: const TextStyle(
                               color: Colors.grey,
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
@@ -166,7 +163,7 @@ class _GuideScreenState extends State<GuideScreen> {
                           ),
                           alignment: Alignment.center,
                           child: Text(
-                            tabs[index],
+                            tabs[index].tr(),
                             style: TextStyle(
                               color: isSelected ? Colors.black : Colors.grey,
                               fontWeight: isSelected
@@ -244,7 +241,7 @@ class _GuideScreenState extends State<GuideScreen> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        item["title"]!,
+                                        item["titleKey"]!.tr(),
                                         style: const TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 14,
@@ -252,7 +249,7 @@ class _GuideScreenState extends State<GuideScreen> {
                                       ),
                                       const SizedBox(height: 4),
                                       Text(
-                                        item["desc"]!,
+                                        item["descKey"]!.tr(),
                                         maxLines: 3,
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(

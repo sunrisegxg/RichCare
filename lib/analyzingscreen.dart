@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:ricecare/resultsscreen.dart';
 
@@ -21,7 +22,9 @@ class _AnalyzingScreenState extends State<AnalyzingScreen> {
     // ⏳ giả lập call AI (2-3s)
     await Future.delayed(const Duration(seconds: 3));
 
-    // 👉 sau khi phân tích xong → chuyển sang màn result của bạn
+    // widget đã dispose thì dừng
+    if (!mounted) return;
+
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (_) => ResultsScreen(type: ResultType.scan)),
@@ -35,8 +38,8 @@ class _AnalyzingScreenState extends State<AnalyzingScreen> {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            SizedBox(
+          children: [
+            const SizedBox(
               width: 60,
               height: 60,
               child: CircularProgressIndicator(
@@ -44,10 +47,10 @@ class _AnalyzingScreenState extends State<AnalyzingScreen> {
                 color: Colors.blue,
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Text(
-              "AI is analyzing the rice leaf...",
-              style: TextStyle(color: Colors.white70),
+              'analyzing_message'.tr(),
+              style: const TextStyle(color: Colors.white70),
             ),
           ],
         ),

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:ricecare/authswitcherscreen.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -19,27 +20,23 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
   final List<Map<String, String>> pages = [
     {
       "image": "assets/images/paddy1.jpg",
-      "title": "Protect your rice crops",
-      "description":
-          " helps you detect rice plant diseases early and keep your crops healthy.",
+      "title": "onboarding_title_1",
+      "description": "onboarding_desc_1",
     },
     {
       "image": "assets/images/paddy2.webp",
-      "title": "Scan rice leaves",
-      "description":
-          "Take a photo or upload an image of rice leaves to start the analysis.",
+      "title": "onboarding_title_2",
+      "description": "onboarding_desc_2",
     },
     {
       "image": "assets/images/paddy3.webp",
-      "title": "AI disease detection",
-      "description":
-          "Our AI analyzes the image to identify possible diseases on rice plants.",
+      "title": "onboarding_title_3",
+      "description": "onboarding_desc_3",
     },
     {
       "image": "assets/images/paddy3.webp",
-      "title": "Get results instantly",
-      "description":
-          "Receive accurate diagnoses and helpful recommendations for your crops.",
+      "title": "onboarding_title_4",
+      "description": "onboarding_desc_4",
     },
   ];
   @override
@@ -96,7 +93,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                "RiceCare",
+                                "app_name".tr(),
                                 style: TextStyle(
                                   fontSize: 16,
                                   color: AppColors.logoNameColor,
@@ -114,7 +111,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                           SizedBox(height: 24),
                           // title
                           Text(
-                            pages[index]["title"]!,
+                            pages[index]["title"]!.tr(),
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -129,7 +126,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                               children: [
                                 index == 0
                                     ? TextSpan(
-                                        text: "RiceCare",
+                                        text: "app_name".tr(),
                                         style: TextStyle(
                                           fontSize: 16,
                                           color: AppColors.logoNameColor,
@@ -138,7 +135,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                                       )
                                     : TextSpan(),
                                 TextSpan(
-                                  text: pages[index]["description"]!,
+                                  text: pages[index]["description"]!.tr(),
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,
@@ -167,7 +164,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                               ),
                               index == 3
                                   ? BtnText(
-                                      text: "Start now",
+                                      text: "start_now".tr(),
                                       width: 120,
                                       onPressed: () =>
                                           Navigator.pushReplacement(

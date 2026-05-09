@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 class EditProfileScreen extends StatefulWidget {
@@ -36,11 +37,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                   ),
 
-                  const Expanded(
+                  Expanded(
                     child: Center(
                       child: Text(
-                        "Edit Profile",
-                        style: TextStyle(
+                        'edit_profile'.tr(),
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 17,
                         ),
@@ -99,31 +100,31 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     const SizedBox(height: 22),
 
                     buildField(
-                      title: "Full Name",
+                      title: 'full_name'.tr(),
                       icon: Icons.person_outline,
                       controller: nameController,
                     ),
 
                     buildField(
-                      title: "Email",
+                      title: 'email'.tr(),
                       icon: Icons.email_outlined,
                       controller: emailController,
                     ),
 
                     buildField(
-                      title: "Phone Number",
+                      title: 'phone_number'.tr(),
                       icon: Icons.phone_outlined,
                       controller: phoneController,
                     ),
 
                     buildField(
-                      title: "Location",
+                      title: 'location_label'.tr(),
                       icon: Icons.location_on_outlined,
                       controller: locationController,
                     ),
 
                     buildField(
-                      title: "Bio",
+                      title: 'bio'.tr(),
                       icon: Icons.edit_note,
                       controller: bioController,
                       maxLines: 3,
@@ -138,8 +139,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       child: ElevatedButton(
                         onPressed: () {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("Profile updated successfully"),
+                            SnackBar(
+                              content: Text(
+                                'profile_updated_successfully'.tr(),
+                              ),
                             ),
                           );
                         },
@@ -151,9 +154,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             borderRadius: BorderRadius.circular(16),
                           ),
                         ),
-                        child: const Text(
-                          "Save changes",
-                          style: TextStyle(
+                        child: Text(
+                          'save_changes'.tr(),
+                          style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
                           ),

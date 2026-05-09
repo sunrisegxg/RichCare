@@ -1,5 +1,7 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:ricecare/authswitcherscreen.dart';
+import 'package:ricecare/languagescreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'editprofilescreen.dart';
@@ -94,7 +96,7 @@ class _ProfileScreenUIState extends State<ProfileScreenUI> {
                   Expanded(
                     child: Center(
                       child: Text(
-                        "Profile",
+                        "profile".tr(),
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
@@ -116,7 +118,7 @@ class _ProfileScreenUIState extends State<ProfileScreenUI> {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 children: [
                   // 🔹 Account Setting
-                  sectionTitle("Account Setting"),
+                  sectionTitle("account_setting".tr()),
                   GestureDetector(
                     onTap: () {
                       Navigator.push(
@@ -126,34 +128,44 @@ class _ProfileScreenUIState extends State<ProfileScreenUI> {
                         ),
                       );
                     },
-                    child: settingItem(Icons.person, "Edit profile"),
+                    child: settingItem(Icons.person, "edit_profile".tr()),
                   ),
-                  settingItem(Icons.language, "Change language"),
-                  settingItem(Icons.lock, "Privacy"),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const LanguageScreen(),
+                        ),
+                      );
+                    },
+                    child: settingItem(Icons.language, "change_language".tr()),
+                  ),
+                  settingItem(Icons.lock, "privacy".tr()),
 
                   const SizedBox(height: 20),
 
                   // 🔹 Support (NEW)
-                  sectionTitle("Support"),
-                  settingItem(Icons.help_outline, "Help"),
-                  settingItem(Icons.info_outline, "About RiceCare AI"),
+                  sectionTitle("support".tr()),
+                  settingItem(Icons.help_outline, "help".tr()),
+                  settingItem(Icons.info_outline, "about".tr()),
 
                   const SizedBox(height: 20),
 
                   // 🔹 Legal (UPDATED)
-                  sectionTitle("Legal"),
+                  sectionTitle("legal".tr()),
                   settingItem(
                     Icons.description,
-                    "Terms and Conditions",
+                    "terms_conditions".tr(),
                     isExternal: true,
                   ),
                   settingItem(
                     Icons.privacy_tip,
-                    "Privacy Policy",
+                    "privacy_policy".tr(),
                     isExternal: true,
                   ),
                   const SizedBox(height: 20),
-                  sectionTitle("Preferences"),
+                  sectionTitle("preferences".tr()),
                   Container(
                     margin: const EdgeInsets.only(bottom: 12),
                     padding: const EdgeInsets.symmetric(
@@ -174,7 +186,7 @@ class _ProfileScreenUIState extends State<ProfileScreenUI> {
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            "Notifications",
+                            "notifications".tr(),
                             style: TextStyle(color: Colors.green[900]),
                           ),
                         ),
@@ -200,7 +212,7 @@ class _ProfileScreenUIState extends State<ProfileScreenUI> {
                       ),
                       child: Center(
                         child: Text(
-                          "Logout",
+                          "logout".tr(),
                           style: TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.w500,
@@ -216,7 +228,7 @@ class _ProfileScreenUIState extends State<ProfileScreenUI> {
                   // 🔹 Version
                   Center(
                     child: Text(
-                      "Version 1.0.0",
+                      "version".tr(),
                       style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                     ),
                   ),

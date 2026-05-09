@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:ricecare/checkmailscreen.dart';
 
 import 'components/btn_text.dart';
@@ -49,7 +50,7 @@ class _ForgotScreenState extends State<ForgotScreen> {
                 Align(
                   alignment: Alignment.center,
                   child: Text(
-                    "Forgot password",
+                    "forgot_password".tr(),
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -59,7 +60,7 @@ class _ForgotScreenState extends State<ForgotScreen> {
                 ),
                 SizedBox(height: MediaQuery.of(context).size.height * 0.01),
                 Text(
-                  'Enter your email address and we will send you a link to reset your password.',
+                  'forgot_password_description'.tr(),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 18,
@@ -71,7 +72,7 @@ class _ForgotScreenState extends State<ForgotScreen> {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    "Email address*",
+                    'email_address'.tr(),
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
@@ -85,13 +86,13 @@ class _ForgotScreenState extends State<ForgotScreen> {
                   numBorder: 8,
                   focusNode: _focusNode1,
                   controller: _emailController,
-                  hintText: "example@gmail.com",
+                  hintText: 'email_hint'.tr(),
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.done,
                   onSubmitted: (value) => FocusScope.of(context).unfocus(),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return "Please enter your email";
+                      return 'enter_email'.tr();
                     }
                     //  else if (!InputValidation().isEmailValid(value)) {
                     //   return 'Invalid email';
@@ -102,7 +103,7 @@ class _ForgotScreenState extends State<ForgotScreen> {
                 SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                 BtnText(
                   width: double.infinity,
-                  text: "Send",
+                  text: 'send'.tr(),
                   onPressed: () => Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (context) => CheckMailScreen()),
@@ -115,7 +116,7 @@ class _ForgotScreenState extends State<ForgotScreen> {
                   text: TextSpan(
                     children: [
                       TextSpan(
-                        text: "Remember your password? ",
+                        text: 'remember_password'.tr(),
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w500,
@@ -125,7 +126,7 @@ class _ForgotScreenState extends State<ForgotScreen> {
                       TextSpan(
                         recognizer: TapGestureRecognizer()
                           ..onTap = () => Navigator.of(context).pop(),
-                        text: "Sign in",
+                        text: 'sign_in'.tr(),
                         style: TextStyle(
                           fontSize: 18,
                           color: AppColors.primaryColor,

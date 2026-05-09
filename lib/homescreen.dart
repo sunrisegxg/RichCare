@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:ricecare/constants/colors.dart';
 import 'package:ricecare/profileuiscreen.dart';
@@ -109,8 +110,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       const SizedBox(height: 4),
-                      const Text(
-                        "Good morning 🌱",
+                      Text(
+                        "good_morning".tr(),
                         style: TextStyle(color: Colors.grey, fontSize: 13),
                       ),
                     ],
@@ -158,14 +159,14 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 22),
 
               // 🔹 Weather
-              sectionTitle("Today's Weather"),
+              sectionTitle("today_weather".tr()),
               const SizedBox(height: 12),
               weatherCard(),
 
               const SizedBox(height: 22),
 
               // 🔹 Quick Actions
-              sectionTitle("Quick Actions"),
+              sectionTitle("quick_actions".tr()),
               const SizedBox(height: 12),
 
               GridView.count(
@@ -177,7 +178,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 childAspectRatio: 2.2,
                 children: [
                   actionCard(
-                    "Ask AI",
+                    "ask_ai".tr(),
                     Icons.smart_toy,
                     Colors.blue,
                     onTap: () {
@@ -185,7 +186,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                   ),
                   actionCard(
-                    "History",
+                    "history".tr(),
                     Icons.history,
                     Colors.orange,
                     onTap: () {
@@ -193,7 +194,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                   ),
                   actionCard(
-                    "Guide",
+                    "guide".tr(),
                     Icons.menu_book,
                     Colors.purple,
                     onTap: () {
@@ -201,7 +202,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                   ),
                   actionCard(
-                    "Scan AI",
+                    "scan_ai".tr(),
                     Icons.document_scanner,
                     Colors.green,
                     onTap: () {
@@ -217,7 +218,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 22),
 
               // 🔹 Planner
-              sectionTitle("My Planner"),
+              sectionTitle("my_planner".tr()),
               const SizedBox(height: 12),
 
               calendarPlanner(),
@@ -345,13 +346,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 alignment: Alignment.centerLeft,
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(Icons.edit, color: Colors.white),
                     SizedBox(width: 8),
                     Text(
-                      'Edit',
+                      'edit'.tr(),
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -368,11 +369,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 alignment: Alignment.centerRight,
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'Delete',
+                      'delete'.tr(),
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -427,19 +428,22 @@ class _HomeScreenState extends State<HomeScreen> {
                             //   ),
                             // ),
                             // const SizedBox(width: 12),
-                            const Text(
-                              'Delete note',
-                              style: TextStyle(
+                            Text(
+                              'delete_note'.tr(),
+                              style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                           ],
                         ),
-                        content: const Text(
-                          'Are you sure you want to delete this note? This action cannot be undone.',
+                        content: Text(
+                          'delete_note_confirm'.tr(),
                           textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.black54, height: 1.4),
+                          style: const TextStyle(
+                            color: Colors.black54,
+                            height: 1.4,
+                          ),
                         ),
                         actions: [
                           Row(
@@ -461,8 +465,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                   onPressed: () =>
                                       Navigator.of(context).pop(false),
-                                  child: const Text(
-                                    'Cancel',
+                                  child: Text(
+                                    'cancel'.tr(),
                                     style: TextStyle(
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -483,8 +487,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                   onPressed: () =>
                                       Navigator.of(context).pop(true),
-                                  child: const Text(
-                                    'Delete',
+                                  child: Text(
+                                    'delete'.tr(),
                                     style: TextStyle(
                                       fontWeight: FontWeight.w600,
                                       color: Colors.white,
@@ -503,7 +507,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     await noteService.deleteNote(userId!, note.id);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: const Text('Note deleted'),
+                        content: Text('note_deleted'.tr()),
                         behavior: SnackBarBehavior.floating,
                         margin: const EdgeInsets.fromLTRB(16, 0, 16, 10),
                       ),
@@ -643,9 +647,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
                       const SizedBox(width: 12),
 
-                      const Expanded(
+                      Expanded(
                         child: Text(
-                          "Add Planner Note",
+                          "add_planner_note".tr(),
                           style: TextStyle(
                             fontSize: 19,
                             fontWeight: FontWeight.bold,
@@ -690,7 +694,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   TextField(
                     controller: titleController,
                     decoration: InputDecoration(
-                      hintText: "Title *",
+                      hintText: "title_required".tr(),
                       prefixIcon: const Icon(Icons.title),
                       filled: true,
                       fillColor: const Color(0xffF8FAF8),
@@ -708,7 +712,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     controller: descController,
                     maxLines: 3,
                     decoration: InputDecoration(
-                      hintText: "Description (optional)",
+                      hintText: "description_optional".tr(),
                       alignLabelWithHint: true,
                       prefixIcon: const Padding(
                         padding: EdgeInsets.only(bottom: 52),
@@ -757,7 +761,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           Expanded(
                             child: Text(
                               reminder == null
-                                  ? "Set reminder"
+                                  ? "set_reminder".tr()
                                   : reminder!.format(context),
                               style: TextStyle(
                                 color: reminder == null
@@ -816,7 +820,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           await noteService.addNote(userId!, updatedNote);
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: const Text('Note saved'),
+                              content: Text('note_saved'.tr()),
                               behavior: SnackBarBehavior.floating,
                               margin: const EdgeInsets.fromLTRB(16, 0, 16, 10),
                             ),
@@ -825,7 +829,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           await noteService.updateNote(userId!, updatedNote);
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: const Text('Note updated'),
+                              content: Text('note_updated'.tr()),
                               behavior: SnackBarBehavior.floating,
                               margin: const EdgeInsets.fromLTRB(16, 0, 16, 10),
                             ),
@@ -835,7 +839,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         Navigator.pop(context);
                       },
                       child: Text(
-                        note == null ? "Save Note" : "Update Note",
+                        note == null ? "save_note".tr() : "update_note".tr(),
                         style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -927,10 +931,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
+                      children: [
                         Text(
-                          "Da Nang",
-                          style: TextStyle(
+                          "location".tr(),
+                          style: const TextStyle(
                             color: Colors.white70,
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -952,14 +956,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         SizedBox(height: 6),
 
                         Text(
-                          "Sunny cloudy",
+                          "weather_condition".tr(),
                           style: TextStyle(color: Colors.white70, fontSize: 12),
                         ),
 
                         SizedBox(height: 4),
 
                         Text(
-                          "Monday, 18 Apr",
+                          "date".tr(),
                           style: TextStyle(color: Colors.white60, fontSize: 11),
                         ),
                       ],
@@ -981,9 +985,17 @@ class _HomeScreenState extends State<HomeScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              weatherInfoBlue("assets/images/wind.png", "Wind", "7 km/h"),
-              weatherInfoBlue("assets/images/humidity.png", "Humidity", "82%"),
-              weatherInfoBlue("assets/images/protection.png", "Rain", "20%"),
+              weatherInfoBlue("assets/images/wind.png", "wind".tr(), "7 km/h"),
+              weatherInfoBlue(
+                "assets/images/humidity.png",
+                "humidity".tr(),
+                "82%",
+              ),
+              weatherInfoBlue(
+                "assets/images/protection.png",
+                "rain".tr(),
+                "20%",
+              ),
             ],
           ),
         ],

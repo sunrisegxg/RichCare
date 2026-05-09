@@ -1,4 +1,5 @@
 import 'package:camera/camera.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -190,8 +191,8 @@ class _ScanScreenState extends State<ScanScreen>
                         ),
                       ),
 
-                      const Text(
-                        "Scan rice leaf",
+                      Text(
+                        "onboarding_title_2".tr(),
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w600,

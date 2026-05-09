@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import 'analyzingscreen.dart';
@@ -83,8 +84,8 @@ class PostScanScreen extends StatelessWidget {
                           ),
                         );
                       },
-                      child: const Text(
-                        "Analyze",
+                      child: Text(
+                        "analyze".tr(),
                         style: TextStyle(fontWeight: FontWeight.w600),
                       ),
                     ),

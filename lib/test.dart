@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'guidescreen.dart';
 import 'chatscreen.dart';
 import 'constants/colors.dart';
@@ -82,7 +83,7 @@ class _TestState extends State<Test> {
                               : AppColors.textBottomColor,
                         ),
                         Text(
-                          "Home",
+                          "home".tr(),
                           style: TextStyle(
                             fontSize: 12,
                             color: _selectedIndex == 0
@@ -105,7 +106,7 @@ class _TestState extends State<Test> {
                               : AppColors.textBottomColor,
                         ),
                         Text(
-                          "Chat",
+                          "chat".tr(),
                           style: TextStyle(
                             fontSize: 12,
                             color: _selectedIndex == 1
@@ -129,7 +130,7 @@ class _TestState extends State<Test> {
                               : AppColors.textBottomColor,
                         ),
                         Text(
-                          "Guide",
+                          "guide".tr(),
                           style: TextStyle(
                             fontSize: 12,
                             color: _selectedIndex == 2
@@ -152,7 +153,7 @@ class _TestState extends State<Test> {
                               : AppColors.textBottomColor,
                         ),
                         Text(
-                          "History",
+                          "history".tr(),
                           style: TextStyle(
                             fontSize: 12,
                             color: _selectedIndex == 3

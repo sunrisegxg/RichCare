@@ -146,7 +146,7 @@
   "spread_risk": "Spread Risk",
   "re_scan": "Re-scan",
   "share_result": "Share result",
-  "save_this_plant": "Save this plant",
+  "save_result": "Save result",
   "register_description": " and start detecting rice diseases with AI.",
   "weather": {
     "clear": "Clear",
@@ -155,5 +155,7 @@
     "drizzle": "Drizzle",
     "thunderstorm": "Thunderstorm",
     "snow": "Snow"
-  }
+  },
+  "scanned_result": "Scanned result",
+  "saved_result_on": "Saved result on"
 }

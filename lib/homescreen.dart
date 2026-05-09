@@ -154,31 +154,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
               const SizedBox(height: 18),
 
-              // 🔹 Scan Card
-              // Container(
-              //   padding: const EdgeInsets.all(16),
-              //   decoration: BoxDecoration(
-              //     color: const Color(0xFFE7F6EA),
-              //     borderRadius: BorderRadius.circular(18),
-              //   ),
-              //   child: Row(
-              //     mainAxisAlignment: MainAxisAlignment.center,
-              //     children: [
-              //       Icon(Icons.document_scanner, color: AppColors.btnbgrColor),
-              //       const SizedBox(width: 12),
-              //       Text(
-              //         "Scan and identify rice diseases",
-              //         style: TextStyle(
-              //           fontWeight: FontWeight.w600,
-              //           fontSize: 14,
-              //           color: AppColors.btnbgrColor,
-              //         ),
-              //       ),
-              //     ],
-              //   ),
-              // ),
-              const SizedBox(height: 22),
-
               // 🔹 Weather
               sectionTitle("today_weather".tr()),
               const SizedBox(height: 12),
@@ -906,12 +881,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget weatherCard() {
     final now = DateTime.now();
-    final isVi = context.locale.languageCode == 'vi';
-
-    final formattedTime = DateFormat(
-      'dd/MM/yyyy hh:mm a',
-      isVi ? 'vi_VN' : 'en_US',
-    ).format(now);
+    final formattedTime = DateFormat('dd/MM/yyyy').format(now);
     if (loadingWeather) {
       return Shimmer.fromColors(
         baseColor: Colors.grey.shade300,

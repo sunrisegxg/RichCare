@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:readmore/readmore.dart';
-import 'package:ricecare/constants/colors.dart';
+import 'package:ricecare/main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import 'constants/colors.dart';
 import 'models/guidemodel.dart';
 
 enum ResultType { scan, history, guide }
@@ -29,16 +32,45 @@ class _ResultsScreenState extends State<ResultsScreen> {
     return value.split("(").first.trim();
   }
 
+  Future<void> showNotification() async {
+    final prefs = await SharedPreferences.getInstance();
+    final enabled = prefs.getBool('notification_enabled') ?? false;
+
+    if (!enabled) {
+      print("Notification đang bị tắt");
+      return; // ❌ không gửi
+    }
+
+    const AndroidNotificationDetails androidDetails =
+        AndroidNotificationDetails(
+          'channel_id',
+          'Reminder',
+          importance: Importance.max,
+          priority: Priority.high,
+        );
+
+    const NotificationDetails details = NotificationDetails(
+      android: androidDetails,
+    );
+
+    await flutterLocalNotificationsPlugin.show(
+      id: 0,
+      title: 'Xin chào 👋',
+      body: 'Đây là Local Notification đầu tiên của bạn!',
+      notificationDetails: details,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    // ===== DATA FROM API (guide mode) =====
-    final title = isGuide ? (guide?.title ?? "") : "Rice Blast";
+    final title = isGuide
+        ? (guide?.title ?? "")
+        : "Rice Blastssssssssssssssssss";
 
     final description = isGuide
         ? (guide?.definition ?? "")
         : "rice_blast_description".tr();
 
-    // split symptoms theo dòng từ API
     final symptomsList = isGuide
         ? (guide?.symtomz ?? "")
               .split("\n")
@@ -48,7 +80,6 @@ class _ResultsScreenState extends State<ResultsScreen> {
 
     final cause = isGuide ? (guide?.cause ?? "") : "cause_description".tr();
 
-    // 👉 recommendation lấy từ measurement (theo yêu cầu của bạn)
     final recommendation = isGuide
         ? (guide?.measurement ?? "")
         : "rec_default".tr();
@@ -61,14 +92,12 @@ class _ResultsScreenState extends State<ResultsScreen> {
       backgroundColor: Colors.grey[100],
       body: Stack(
         children: [
-          // IMAGE HEADER
           SizedBox(
             height: 300,
             width: double.infinity,
             child: Image.asset("assets/images/paddy1.jpg", fit: BoxFit.cover),
           ),
 
-          // CLOSE BUTTON
           Positioned(
             top: 40,
             right: 16,
@@ -81,7 +110,6 @@ class _ResultsScreenState extends State<ResultsScreen> {
             ),
           ),
 
-          // CONTENT SHEET
           DraggableScrollableSheet(
             initialChildSize: 0.65,
             minChildSize: 0.65,
@@ -100,7 +128,6 @@ class _ResultsScreenState extends State<ResultsScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // DRAG HANDLE
                       Center(
                         child: Container(
                           width: 40,
@@ -113,18 +140,70 @@ class _ResultsScreenState extends State<ResultsScreen> {
                         ),
                       ),
 
-                      // TITLE
-                      Text(
-                        title,
-                        style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
+                      // 🔥 SCAN / HISTORY HEADER (THÊM LẠI)
+                      if (isScan || isHistory)
+                        Row(
+                          children: [
+                            const CircleAvatar(
+                              radius: 12,
+                              backgroundColor: Color(0xFFE8F5E9),
+                              child: Icon(
+                                Icons.check,
+                                size: 14,
+                                color: Colors.green,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              isHistory
+                                  ? "analysis_result".tr()
+                                  : "hurray_identified".tr(),
+                              style: const TextStyle(
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
+
+                      const SizedBox(height: 10),
+
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            flex: isHistory ? 1 : 7,
+                            child: Text(
+                              title,
+                              style: const TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+
+                          if (isScan || isHistory) ...[
+                            const SizedBox(width: 10),
+
+                            Expanded(
+                              flex: isHistory ? 1 : 3,
+                              child: Text(
+                                isHistory
+                                    ? "${"saved_result_on".tr()} 12/08/2024"
+                                    : "scanned_result".tr(),
+                                textAlign: TextAlign.right,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
 
                       const SizedBox(height: 10),
 
-                      // DESCRIPTION
                       sectionTitle("description".tr()),
                       ReadMoreText(
                         description,
@@ -137,34 +216,22 @@ class _ResultsScreenState extends State<ResultsScreen> {
 
                       const SizedBox(height: 16),
 
-                      // SYMPTOMS (NO BULLET)
                       sectionTitle("symptoms".tr()),
-                      Text(
-                        symptomsList.join("\n"),
-                        style: const TextStyle(fontSize: 14, height: 1.5),
-                      ),
+                      Text(symptomsList.join("\n")),
 
                       const SizedBox(height: 16),
 
-                      // CAUSE
                       sectionTitle("cause".tr()),
                       Text(cause),
 
                       const SizedBox(height: 16),
 
-                      // RECOMMENDATION (measurement)
                       sectionTitle("recommendation".tr()),
-                      Text(
-                        recommendation,
-                        style: const TextStyle(fontSize: 14, height: 1.5),
-                      ),
-
-                      const SizedBox(height: 20),
-                      const Divider(),
+                      Text(recommendation),
 
                       const SizedBox(height: 10),
-
-                      // INFO BOXES
+                      const Divider(),
+                      const SizedBox(height: 10),
                       Row(
                         children: [
                           Expanded(
@@ -199,10 +266,89 @@ class _ResultsScreenState extends State<ResultsScreen> {
                               Icons.water_drop_rounded,
                             ),
                           ),
+                          if (isScan || isHistory) ...[
+                            SizedBox(width: 10),
+                            Expanded(
+                              child: infoBox(
+                                "confidence".tr(),
+                                "92%",
+                                Colors.green,
+                                Icons.verified_rounded,
+                              ),
+                            ),
+                          ],
                         ],
                       ),
 
                       const SizedBox(height: 20),
+                      if (isScan || isHistory)
+                        Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton(
+                                onPressed: () {
+                                  isHistory
+                                      ? showNotification()
+                                      : Navigator.pop(context);
+                                },
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: isHistory
+                                      ? Colors.red
+                                      : AppColors.primaryColor,
+                                  side: BorderSide(
+                                    color: isHistory
+                                        ? Colors.red
+                                        : AppColors.primaryColor,
+                                    width: 2,
+                                  ),
+                                  padding: EdgeInsets.symmetric(vertical: 20),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                child: Text(
+                                  isHistory ? "delete".tr() : "re_scan".tr(),
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 10),
+                            Expanded(
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.btnbgrColor,
+                                  foregroundColor: Colors.white,
+                                  padding: EdgeInsets.symmetric(vertical: 20),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                onPressed: () {},
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      isHistory
+                                          ? Icons.share_outlined
+                                          : Icons.bookmark_add_outlined,
+                                      size: 20,
+                                    ),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      isHistory
+                                          ? "share_result".tr()
+                                          : "save_result".tr(),
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      SizedBox(height: 20),
                     ],
                   ),
                 ),
@@ -213,8 +359,6 @@ class _ResultsScreenState extends State<ResultsScreen> {
       ),
     );
   }
-
-  // ===== UI HELPERS =====
 
   Widget sectionTitle(String text) {
     return Padding(
@@ -228,7 +372,6 @@ class _ResultsScreenState extends State<ResultsScreen> {
 
   Widget infoBox(String title, String value, Color color, IconData icon) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start, // 👈 quan trọng
       children: [
         Container(
           width: 40,
@@ -239,34 +382,24 @@ class _ResultsScreenState extends State<ResultsScreen> {
           ),
           child: Icon(icon, color: color),
         ),
-
         const SizedBox(width: 10),
-
-        Expanded(
-          // 👈 quan trọng nhất
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: color,
-                  fontWeight: FontWeight.w600,
-                ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 12,
+                color: color,
+                fontWeight: FontWeight.w600,
               ),
-
-              const SizedBox(height: 4),
-
-              Text(
-                value,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                ),
-              ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              value,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+            ),
+          ],
         ),
       ],
     );

@@ -147,7 +147,7 @@
   "spread_risk": "Nguy cơ lây lan",
   "re_scan": "Quét lại",
   "share_result": "Chia sẻ kết quả",
-  "save_this_plant": "Lưu cây này",
+  "save_result": "Lưu kết quả",
   "register_description": " và bắt đầu phát hiện bệnh lúa với AI.",
    "weather": {
     "clear": "Trời quang",
@@ -156,5 +156,7 @@
     "drizzle": "Mưa phùn",
     "thunderstorm": "Giông bão",
     "snow": "Tuyết"
-  }
+  },
+  "scanned_result": "Kết quả đã quét",
+  "saved_result_on": "Kết quả đã lưu vào ngày"
 }

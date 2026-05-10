@@ -4,8 +4,8 @@ import 'package:shimmer/shimmer.dart';
 import 'package:translator/translator.dart';
 
 import 'constants/colors.dart';
+import 'guide_result_screen.dart';
 import 'models/guidemodel.dart';
-import 'resultsscreen.dart';
 import 'services/guide_service.dart';
 
 class GuideScreen extends StatefulWidget {
@@ -299,10 +299,7 @@ class _GuideScreenState extends State<GuideScreen> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => ResultsScreen(
-                  type: ResultType.guide,
-                  guide: translatedItem,
-                ),
+                builder: (_) => GuideResultScreen(guide: translatedItem),
               ),
             );
           },
@@ -363,28 +360,68 @@ class _GuideScreenState extends State<GuideScreen> {
   Future<GuideModel> _translateIfNeeded(GuideModel item) async {
     if (context.locale.languageCode == 'en') {
       final translator = GoogleTranslator();
+
       final titleTrans = await translator.translate(
         item.title,
         from: 'auto',
         to: 'en',
       );
+
       final defTrans = await translator.translate(
         item.definition,
         from: 'auto',
         to: 'en',
       );
+
+      final symptomTrans = await translator.translate(
+        item.symtomz ?? "",
+        from: 'auto',
+        to: 'en',
+      );
+
+      final measurementTrans = await translator.translate(
+        item.measurement ?? "",
+        from: 'auto',
+        to: 'en',
+      );
+
+      final causeTrans = await translator.translate(
+        item.cause ?? "",
+        from: 'auto',
+        to: 'en',
+      );
+
+      final spreadRiskTrans = await translator.translate(
+        item.speadrisk ?? "",
+        from: 'auto',
+        to: 'en',
+      );
+
+      final humidityTrans = await translator.translate(
+        item.humidity ?? "",
+        from: 'auto',
+        to: 'en',
+      );
+
+      final severityTrans = await translator.translate(
+        item.severity ?? "",
+        from: 'auto',
+        to: 'en',
+      );
+
       return GuideModel(
         idFE: item.idFE,
         title: titleTrans.text,
         definition: defTrans.text,
-        symtomz: item.symtomz,
-        measurement: item.measurement,
-        cause: item.cause,
-        speadrisk: item.speadrisk,
-        humidity: item.humidity,
-        severity: item.severity,
+        symtomz: symptomTrans.text,
+        measurement: measurementTrans.text,
+        cause: causeTrans.text,
+        speadrisk: spreadRiskTrans.text,
+        humidity: humidityTrans.text,
+        severity: severityTrans.text,
       );
     }
+
     return item;
   }
 }

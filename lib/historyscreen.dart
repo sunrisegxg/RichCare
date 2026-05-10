@@ -1,8 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:translator/translator.dart';
 import 'constants/colors.dart';
+import 'history_result_screen.dart';
 import 'models/historymodel.dart';
-import 'resultsscreen.dart';
 import 'services/history_service.dart';
 import 'services/token_service.dart';
 
@@ -221,9 +222,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     return GestureDetector(
       onTap: () => Navigator.push(
         context,
-        MaterialPageRoute(
-          builder: (_) => ResultsScreen(type: ResultType.history),
-        ),
+        MaterialPageRoute(builder: (_) => HistoryResultScreen(history: item)),
       ),
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
@@ -255,12 +254,22 @@ class _HistoryScreenState extends State<HistoryScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    item.title,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
+                  FutureBuilder<String>(
+                    future: context.locale.languageCode == "vi"
+                        ? Future.value(item.titleVi)
+                        : GoogleTranslator()
+                              .translate(item.titleVi, to: "en")
+                              .then((value) => value.text),
+
+                    builder: (context, snapshot) {
+                      return Text(
+                        snapshot.data ?? item.titleVi,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      );
+                    },
                   ),
                   const SizedBox(height: 4),
                   Text(

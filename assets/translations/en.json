@@ -162,5 +162,6 @@
   },
   "scanned_result": "Scanned result",
   "saved_result_on": "Saved result on",
-  "unable_to_identify": "Unable to identify the disease"
+  "unable_to_identify": "Unable to identify the disease",
+  "saved_success": "Result saved successfully"
 }

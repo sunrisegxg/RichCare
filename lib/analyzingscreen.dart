@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:ricecare/resultsscreen.dart';
 
+import 'scan_result_screen.dart';
 import 'services/disease_prediction_service.dart';
 
 class AnalyzingScreen extends StatefulWidget {
@@ -32,9 +32,7 @@ class _AnalyzingScreenState extends State<AnalyzingScreen> {
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (_) => ResultsScreen(type: ResultType.scan, result: result),
-        ),
+        MaterialPageRoute(builder: (_) => ScanResultScreen(result: result)),
       );
     } catch (e) {
       debugPrint("Analyze Error: $e");

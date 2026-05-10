@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -7,14 +10,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'constants/colors.dart';
 import 'models/guidemodel.dart';
+import 'models/predictionresultmode.dart';
 
 enum ResultType { scan, history, guide }
 
 class ResultsScreen extends StatefulWidget {
   final ResultType type;
   final GuideModel? guide;
+  final PredictionResult? result;
 
-  const ResultsScreen({super.key, required this.type, this.guide});
+  const ResultsScreen({super.key, required this.type, this.guide, this.result});
 
   @override
   State<ResultsScreen> createState() => _ResultsScreenState();
@@ -22,6 +27,7 @@ class ResultsScreen extends StatefulWidget {
 
 class _ResultsScreenState extends State<ResultsScreen> {
   GuideModel? get guide => widget.guide;
+  PredictionResult? get result => widget.result;
 
   bool get isGuide => widget.type == ResultType.guide;
   bool get isScan => widget.type == ResultType.scan;
@@ -63,9 +69,13 @@ class _ResultsScreenState extends State<ResultsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isVietnamese = context.locale.languageCode == "vi";
+
     final title = isGuide
         ? (guide?.title ?? "")
-        : "Rice Blastssssssssssssssssss";
+        : (isVietnamese
+              ? (result?.classVi ?? "Không xác định")
+              : (result?.classEn ?? "Unknown Disease"));
 
     final description = isGuide
         ? (guide?.definition ?? "")
@@ -87,17 +97,32 @@ class _ResultsScreenState extends State<ResultsScreen> {
     final severity = isGuide ? cleanValue(guide?.severity) : "Medium";
     final spreadRisk = isGuide ? cleanValue(guide?.speadrisk) : "High";
     final humidity = isGuide ? (guide?.humidity ?? "") : "High";
-
+    final hasReason = (result?.reason?.trim().isNotEmpty ?? false);
+    // final isSuccess = result?.success ?? false;
+    // if (!isSuccess && isScan) {
+    //   return Scaffold(body: Center(child: Text("Analyze failed")));
+    // }
     return Scaffold(
       backgroundColor: Colors.grey[100],
       body: Stack(
         children: [
-          SizedBox(
-            height: 300,
-            width: double.infinity,
-            child: Image.asset("assets/images/paddy1.jpg", fit: BoxFit.cover),
-          ),
-
+          isScan
+              ? SizedBox(
+                  height: 300,
+                  width: double.infinity,
+                  child: Image.memory(
+                    base64Decode(result!.originalImage!),
+                    fit: BoxFit.cover,
+                  ),
+                )
+              : SizedBox(
+                  height: 300,
+                  width: double.infinity,
+                  child: Image.asset(
+                    "assets/images/paddy1.jpg",
+                    fit: BoxFit.cover,
+                  ),
+                ),
           Positioned(
             top: 40,
             right: 16,
@@ -172,7 +197,11 @@ class _ResultsScreenState extends State<ResultsScreen> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Expanded(
-                            flex: isHistory ? 1 : 7,
+                            flex: isHistory
+                                ? 1
+                                : isScan
+                                ? 7
+                                : 0,
                             child: Text(
                               title,
                               style: const TextStyle(
@@ -204,81 +233,136 @@ class _ResultsScreenState extends State<ResultsScreen> {
 
                       const SizedBox(height: 10),
 
-                      sectionTitle("description".tr()),
-                      ReadMoreText(
-                        description,
-                        trimLines: 2,
-                        trimMode: TrimMode.Line,
-                        trimCollapsedText: 'read_more'.tr(),
-                        trimExpandedText: 'show_less'.tr(),
-                        style: const TextStyle(fontSize: 14, height: 1.5),
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      sectionTitle("symptoms".tr()),
-                      Text(symptomsList.join("\n")),
-
-                      const SizedBox(height: 16),
-
-                      sectionTitle("cause".tr()),
-                      Text(cause),
-
-                      const SizedBox(height: 16),
-
-                      sectionTitle("recommendation".tr()),
-                      Text(recommendation),
-
-                      const SizedBox(height: 10),
-                      const Divider(),
-                      const SizedBox(height: 10),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: infoBox(
-                              "severity".tr(),
-                              severity,
-                              Colors.orange,
-                              Icons.local_fire_department,
-                            ),
+                      if (isScan)
+                        Container(
+                          width: double.infinity,
+                          margin: const EdgeInsets.only(top: 20),
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.05),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: infoBox(
-                              "spread_risk".tr(),
-                              spreadRisk,
-                              Colors.red,
-                              Icons.warning_amber_rounded,
-                            ),
-                          ),
-                        ],
-                      ),
+                          child: hasReason
+                              ? Column(
+                                  children: [
+                                    Text(
+                                      "unable_to_identify".tr(),
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
 
-                      const SizedBox(height: 10),
+                                    const SizedBox(height: 10),
 
-                      Row(
-                        children: [
-                          Expanded(
-                            child: infoBox(
-                              "humidity".tr(),
-                              humidity,
-                              Colors.blue,
-                              Icons.water_drop_rounded,
-                            ),
-                          ),
-                          if (isScan || isHistory) ...[
-                            SizedBox(width: 10),
+                                    Text(
+                                      result!.reason!,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        color: Colors.grey[700],
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              : Row(
+                                  children: [
+                                    Expanded(
+                                      child: infoBox(
+                                        "confidence".tr(),
+                                        "${((result?.confidence ?? 0) * 100).toStringAsFixed(1)}%",
+                                        Colors.green,
+                                        Icons.verified_rounded,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                        )
+                      else ...[
+                        sectionTitle("description".tr()),
+                        ReadMoreText(
+                          description,
+                          trimLines: 2,
+                          trimMode: TrimMode.Line,
+                          trimCollapsedText: 'read_more'.tr(),
+                          trimExpandedText: 'show_less'.tr(),
+                          style: const TextStyle(fontSize: 14, height: 1.5),
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        sectionTitle("symptoms".tr()),
+                        Text(symptomsList.join("\n")),
+
+                        const SizedBox(height: 16),
+
+                        sectionTitle("cause".tr()),
+                        Text(cause),
+
+                        const SizedBox(height: 16),
+
+                        sectionTitle("recommendation".tr()),
+                        Text(recommendation),
+
+                        const SizedBox(height: 10),
+                        const Divider(),
+                        const SizedBox(height: 10),
+                        Row(
+                          children: [
                             Expanded(
                               child: infoBox(
-                                "confidence".tr(),
-                                "92%",
-                                Colors.green,
-                                Icons.verified_rounded,
+                                "severity".tr(),
+                                severity,
+                                Colors.orange,
+                                Icons.local_fire_department,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: infoBox(
+                                "spread_risk".tr(),
+                                spreadRisk,
+                                Colors.red,
+                                Icons.warning_amber_rounded,
                               ),
                             ),
                           ],
-                        ],
-                      ),
+                        ),
+
+                        const SizedBox(height: 10),
+
+                        Row(
+                          children: [
+                            Expanded(
+                              child: infoBox(
+                                "humidity".tr(),
+                                humidity,
+                                Colors.blue,
+                                Icons.water_drop_rounded,
+                              ),
+                            ),
+                            if (isScan || isHistory) ...[
+                              SizedBox(width: 10),
+                              Expanded(
+                                child: infoBox(
+                                  "confidence".tr(),
+                                  "${((result?.confidence ?? 0) * 100).toStringAsFixed(1)}%",
+                                  Colors.green,
+                                  Icons.verified_rounded,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ],
 
                       const SizedBox(height: 20),
                       if (isScan || isHistory)

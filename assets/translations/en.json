@@ -157,5 +157,6 @@
     "snow": "Snow"
   },
   "scanned_result": "Scanned result",
-  "saved_result_on": "Saved result on"
+  "saved_result_on": "Saved result on",
+  "unable_to_identify": "Unable to identify the disease"
 }

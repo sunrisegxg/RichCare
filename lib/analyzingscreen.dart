@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:ricecare/resultsscreen.dart';
+
+import 'services/disease_prediction_service.dart';
 
 class AnalyzingScreen extends StatefulWidget {
   final String imagePath;
@@ -19,16 +23,30 @@ class _AnalyzingScreenState extends State<AnalyzingScreen> {
   }
 
   Future<void> analyzeImage() async {
-    // ⏳ giả lập call AI (2-3s)
-    await Future.delayed(const Duration(seconds: 3));
+    try {
+      final result = await DiseasePredictionService.predict(
+        File(widget.imagePath),
+      );
 
-    // widget đã dispose thì dừng
-    if (!mounted) return;
+      if (!mounted) return;
 
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => ResultsScreen(type: ResultType.scan)),
-    );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ResultsScreen(type: ResultType.scan, result: result),
+        ),
+      );
+    } catch (e) {
+      debugPrint("Analyze Error: $e");
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Analyze failed")));
+
+      Navigator.pop(context);
+    }
   }
 
   @override

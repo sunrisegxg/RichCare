@@ -158,5 +158,6 @@
     "snow": "Tuyết"
   },
   "scanned_result": "Kết quả đã quét",
-  "saved_result_on": "Kết quả đã lưu vào ngày"
+  "saved_result_on": "Kết quả đã lưu vào ngày",
+  "unable_to_identify": "Không thể xác định bệnh"
 }

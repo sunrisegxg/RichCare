@@ -1,5 +1,10 @@
+import 'dart:convert';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:translator/translator.dart';
+import 'languagescreen.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -9,6 +14,95 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+  final TextEditingController controller = TextEditingController();
+
+  final ScrollController scrollController = ScrollController();
+
+  List<Map<String, dynamic>> messages = [];
+
+  bool isLoading = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (messages.isEmpty) {
+      messages.add({"text": 'chat_welcome'.tr(), "isMe": false});
+    }
+  }
+
+  Future<void> sendMessage([String? value]) async {
+    final text = value ?? controller.text.trim();
+
+    if (text.isEmpty) return;
+
+    setState(() {
+      messages.add({"text": text, "isMe": true});
+
+      isLoading = true;
+    });
+
+    controller.clear();
+
+    scrollToBottom();
+
+    try {
+      final response = await http.post(
+        Uri.parse("https://9589-14-233-226-148.ngrok-free.app/chat"),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"question": text}),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        String answer = data["answer"] ?? 'no_response'.tr();
+
+        if (context.locale.languageCode == 'en') {
+          final translator = GoogleTranslator();
+          final translation = await translator.translate(
+            answer,
+            from: 'auto',
+            to: 'en',
+          );
+          answer = translation.text;
+        }
+
+        setState(() {
+          messages.add({"text": answer, "isMe": false});
+        });
+      } else {
+        setState(() {
+          messages.add({
+            "text": '${'ai_server_error'.tr()} (${response.statusCode})',
+            "isMe": false,
+          });
+        });
+      }
+    } catch (e) {
+      setState(() {
+        messages.add({"text": 'cannot_connect_to_ai'.tr(), "isMe": false});
+      });
+    }
+
+    setState(() {
+      isLoading = false;
+    });
+
+    scrollToBottom();
+  }
+
+  void scrollToBottom() {
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (scrollController.hasClients) {
+        scrollController.animateTo(
+          scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,12 +111,11 @@ class _ChatScreenState extends State<ChatScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // 🔹 Header thay AppBar
+            // HEADER
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               child: Row(
                 children: [
-                  // Logo bên trái
                   Padding(
                     padding: const EdgeInsets.only(bottom: 4),
                     child: Image.asset(
@@ -32,12 +125,11 @@ class _ChatScreenState extends State<ChatScreen> {
                     ),
                   ),
 
-                  // Phần giữa
                   Expanded(
                     child: Center(
                       child: RichText(
-                        text: TextSpan(
-                          style: const TextStyle(
+                        text: const TextSpan(
+                          style: TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
                           ),
@@ -60,33 +152,51 @@ class _ChatScreenState extends State<ChatScreen> {
                     ),
                   ),
 
-                  // Nút more bên phải
-                  Container(
-                    padding: EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Color(0xFFF2F2F2),
-                      borderRadius: BorderRadius.circular(8),
+                  GestureDetector(
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => LanguageScreen()),
                     ),
-                    child: Icon(Icons.more_horiz, size: 20),
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF2F2F2),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(Icons.language, size: 20),
+                    ),
                   ),
                 ],
               ),
             ),
 
+            // CHAT
             Expanded(
-              child: ListView(
-                padding: EdgeInsets.all(16),
+              child: ListView.builder(
+                controller: scrollController,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                itemCount: messages.length + (isLoading ? 1 : 0),
+                itemBuilder: (context, index) {
+                  if (index == messages.length) {
+                    return chatBubble(isMe: false, text: 'ai_replying'.tr());
+                  }
+
+                  final msg = messages[index];
+
+                  return chatBubble(isMe: msg["isMe"], text: msg["text"]);
+                },
+              ),
+            ),
+
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  chatBubble(isMe: false, text: 'chat_welcome'.tr()),
-
-                  chatBubble(isMe: true, text: 'chat_sample_question'.tr()),
-
-                  chatBubble(isMe: false, text: 'chat_sample_answer'.tr()),
-
-                  chatBubble(isMe: true, text: "Thank you! ❤️"),
-
-                  SizedBox(height: 16),
-
                   Text(
                     'quick_suggestions'.tr(),
                     style: const TextStyle(fontWeight: FontWeight.bold),
@@ -94,32 +204,35 @@ class _ChatScreenState extends State<ChatScreen> {
 
                   SizedBox(height: 10),
 
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: [
-                      suggestionChip(
-                        'suggestion_rice_blast_treatment',
-                        Color(0xFFEDF8EC),
-                      ),
-                      suggestionChip(
-                        'suggestion_brown_spot',
-                        Color(0xFFF8EFEC),
-                      ),
-                      suggestionChip(
-                        'suggestion_prevent_disease',
-                        Color(0xFFECF6F8),
-                      ),
-                      suggestionChip(
-                        'suggestion_yellow_leaves',
-                        Color(0xFFFEF9EF),
-                      ),
-                    ],
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        suggestionChip(
+                          'suggestion_rice_blast_treatment',
+                          Color(0xFFEDF8EC),
+                        ),
+                        const SizedBox(width: 8),
+                        suggestionChip(
+                          'suggestion_brown_spot',
+                          Color(0xFFF8EFEC),
+                        ),
+                        const SizedBox(width: 8),
+                        suggestionChip(
+                          'suggestion_prevent_disease',
+                          Color(0xFFECF6F8),
+                        ),
+                        const SizedBox(width: 8),
+                        suggestionChip(
+                          'suggestion_yellow_leaves',
+                          Color(0xFFFEF9EF),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
-
             inputBar(),
           ],
         ),
@@ -129,7 +242,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Widget chatBubble({required bool isMe, required String text}) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.only(bottom: 12),
       child: Row(
         mainAxisAlignment: isMe
             ? MainAxisAlignment.end
@@ -137,20 +250,26 @@ class _ChatScreenState extends State<ChatScreen> {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           if (!isMe) ...[
-            Image.asset("assets/images/chatbot.png", width: 40, height: 40),
-            SizedBox(width: 8),
+            Image.asset("assets/images/chatbot.png", width: 36, height: 36),
+
+            const SizedBox(width: 8),
           ],
 
-          Container(
-            padding: EdgeInsets.all(12),
-            constraints: BoxConstraints(maxWidth: 260),
-            decoration: BoxDecoration(
-              color: isMe ? Colors.green : Color(0xFFE6EFE7),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(
-              text,
-              style: TextStyle(color: isMe ? Colors.white : Colors.black),
+          Flexible(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              decoration: BoxDecoration(
+                color: isMe ? Colors.green : const Color(0xFFE6EFE7),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Text(
+                text,
+                style: TextStyle(
+                  fontSize: 15,
+                  height: 1.4,
+                  color: isMe ? Colors.white : Colors.black87,
+                ),
+              ),
             ),
           ),
         ],
@@ -159,13 +278,18 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Widget suggestionChip(String textKey, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(12),
+    return GestureDetector(
+      onTap: () {
+        sendMessage(textKey.tr());
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Text(textKey.tr(), style: const TextStyle(fontSize: 13)),
       ),
-      child: Text(textKey.tr()),
     );
   }
 
@@ -175,20 +299,25 @@ class _ChatScreenState extends State<ChatScreen> {
         left: 16,
         right: 16,
         top: 16,
-        bottom: MediaQuery.of(context).padding.bottom + 40,
+        bottom: MediaQuery.of(context).padding.bottom + 24,
       ),
-      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.green, width: 2),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Colors.green, width: 1.8),
       ),
       child: Row(
         children: [
-          Icon(Icons.add),
-          SizedBox(width: 8),
+          const Icon(Icons.add, color: Colors.black54),
+
+          const SizedBox(width: 8),
 
           Expanded(
             child: TextField(
+              controller: controller,
+              textInputAction: TextInputAction.send,
+              onSubmitted: (_) => sendMessage(),
               decoration: InputDecoration(
                 hintText: 'ask_me_something'.tr(),
                 border: InputBorder.none,
@@ -196,14 +325,15 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           ),
 
-          Icon(Icons.mic_none_outlined),
-          SizedBox(width: 16),
-
-          Padding(
-            padding: const EdgeInsets.only(bottom: 4),
-            child: Transform.rotate(
-              angle: -0.8,
-              child: Icon(Icons.send, color: Colors.green, size: 20),
+          GestureDetector(
+            onTap: sendMessage,
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: const BoxDecoration(
+                color: Colors.green,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.send, color: Colors.white, size: 18),
             ),
           ),
         ],

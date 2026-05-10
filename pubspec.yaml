@@ -53,6 +53,7 @@ dependencies:
   easy_localization: ^3.0.8
   geolocator: ^14.0.2
   shimmer: ^3.0.0
+  translator: ^1.0.4+1
 
 dev_dependencies:
   flutter_test:

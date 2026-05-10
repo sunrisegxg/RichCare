@@ -1,5 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart';
+import 'package:translator/translator.dart';
 
 import 'constants/colors.dart';
 import 'models/guidemodel.dart';
@@ -155,10 +157,63 @@ class _GuideScreenState extends State<GuideScreen> {
 
               const SizedBox(height: 16),
 
-              /// 📄 LIST
               Expanded(
                 child: isLoading
-                    ? const Center(child: CircularProgressIndicator())
+                    ? ListView.builder(
+                        itemCount: 5, // số shimmer items
+                        itemBuilder: (context, index) {
+                          return Shimmer.fromColors(
+                            baseColor: Colors.grey[300]!,
+                            highlightColor: Colors.grey[100]!,
+                            child: Container(
+                              margin: const EdgeInsets.only(bottom: 12),
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: AppColors.backgroundlistTileColor,
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 80,
+                                    height: 80,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          height: 14,
+                                          width: double.infinity,
+                                          color: Colors.white,
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Container(
+                                          height: 12,
+                                          width: double.infinity,
+                                          color: Colors.white,
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Container(
+                                          height: 12,
+                                          width: 150,
+                                          color: Colors.white,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      )
                     : PageView.builder(
                         controller: _pageController,
                         onPageChanged: (index) {
@@ -172,69 +227,7 @@ class _GuideScreenState extends State<GuideScreen> {
                             itemBuilder: (context, index) {
                               final item = guides[index];
 
-                              return GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => ResultsScreen(
-                                        type: ResultType.guide,
-                                        guide: item,
-                                      ),
-                                    ),
-                                  );
-                                },
-                                child: Container(
-                                  margin: const EdgeInsets.only(bottom: 12),
-                                  padding: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.backgroundlistTileColor,
-                                    borderRadius: BorderRadius.circular(14),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(10),
-                                        child: Image.network(
-                                          // nếu API chưa có image -> dùng placeholder
-                                          // item.image ??
-                                          "https://images.unsplash.com/photo-1501004318641-b39e6451bec6",
-                                          width: 80,
-                                          height: 80,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 12),
-
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              item.title,
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 14,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 4),
-                                            Text(
-                                              item.definition,
-                                              maxLines: 3,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: TextStyle(
-                                                color: Colors.grey.shade600,
-                                                fontSize: 12,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
+                              return buildGuideItem(item);
                             },
                           );
                         },
@@ -245,5 +238,153 @@ class _GuideScreenState extends State<GuideScreen> {
         ),
       ),
     );
+  }
+
+  Widget buildGuideItem(GuideModel item) {
+    return FutureBuilder<GuideModel>(
+      future: _translateIfNeeded(item),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Shimmer.fromColors(
+            baseColor: Colors.grey[300]!,
+            highlightColor: Colors.grey[100]!,
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: AppColors.backgroundlistTileColor,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          height: 14,
+                          width: double.infinity,
+                          color: Colors.white,
+                        ),
+                        const SizedBox(height: 4),
+                        Container(
+                          height: 12,
+                          width: double.infinity,
+                          color: Colors.white,
+                        ),
+                        const SizedBox(height: 4),
+                        Container(height: 12, width: 150, color: Colors.white),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        final translatedItem = snapshot.data ?? item;
+
+        return GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => ResultsScreen(
+                  type: ResultType.guide,
+                  guide: translatedItem,
+                ),
+              ),
+            );
+          },
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: AppColors.backgroundlistTileColor,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.network(
+                    // nếu API chưa có image -> dùng placeholder
+                    // item.image ??
+                    "https://images.unsplash.com/photo-1501004318641-b39e6451bec6",
+                    width: 80,
+                    height: 80,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                const SizedBox(width: 12),
+
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        translatedItem.title,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        translatedItem.definition,
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<GuideModel> _translateIfNeeded(GuideModel item) async {
+    if (context.locale.languageCode == 'en') {
+      final translator = GoogleTranslator();
+      final titleTrans = await translator.translate(
+        item.title,
+        from: 'auto',
+        to: 'en',
+      );
+      final defTrans = await translator.translate(
+        item.definition,
+        from: 'auto',
+        to: 'en',
+      );
+      return GuideModel(
+        idFE: item.idFE,
+        title: titleTrans.text,
+        definition: defTrans.text,
+        symtomz: item.symtomz,
+        measurement: item.measurement,
+        cause: item.cause,
+        speadrisk: item.speadrisk,
+        humidity: item.humidity,
+        severity: item.severity,
+      );
+    }
+    return item;
   }
 }

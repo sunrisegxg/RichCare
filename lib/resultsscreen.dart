@@ -278,7 +278,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                                     Expanded(
                                       child: infoBox(
                                         "confidence".tr(),
-                                        "${((result?.confidence ?? 0) * 100).toStringAsFixed(1)}%",
+                                        "${((result?.confidence ?? 0)).toStringAsFixed(1)}%",
                                         Colors.green,
                                         Icons.verified_rounded,
                                       ),
